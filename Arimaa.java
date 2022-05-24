@@ -21,11 +21,15 @@ public class Arimaa implements ActionListener{
 	Container west = new Container();
 	JButton player1 = new JButton("Player 1");
 	JLabel elephantP1 = new JLabel();
-	ImageIcon elephantImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg");
+	JLabel camelP1 = new JLabel();
+	JLabel horseP1 = new JLabel();
+	
 	
 
 	Container east = new Container();
 	JButton player2 = new JButton("Player 2");
+	
+	
 	
 	int PLAYER_ONE = 1;
 	int PLAYER_TWO = 2;
@@ -34,6 +38,15 @@ public class Arimaa implements ActionListener{
 	
 
 	public Arimaa() {
+		//Image resizing elephant
+		ImageIcon elephantImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png");
+		Image eImage = elephantImg.getImage();
+		Image newEImage = eImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		elephantImg = new ImageIcon(newEImage);
+		
+		//Image resizing camel
+		
+		
 		//Frame layout
 		panel.setSize(800, 800);
 		panel.setLayout(new BorderLayout());
@@ -71,7 +84,7 @@ public class Arimaa implements ActionListener{
 		horse2P1.addActionListener(this);*/
 
 		//east Layout
-		east.setLayout(new GridLayout(9, 1));
+		east.setLayout(new GridLayout(9, 3));
 		east.add(player2);
 		player1.addActionListener(this);
 		elephantP1.setIcon(elephantImg);
@@ -89,12 +102,39 @@ public class Arimaa implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		JButton originalSpot = new JButton();
+		JButton newSpot = new JButton();
+		int clicks = 0;
+		
 		if(e.getSource().equals(player1)) {//if player one is going first
 			turn = PLAYER_ONE;
 			setUp();
 		}else if(e.getSource().equals(player2)) {//if player two is going first
 			turn = PLAYER_TWO;
 			setUp();
+		}
+		
+		for(int y = 0; y < board.length; y++) {
+			for(int x = 0; x < board.length; x++) {
+				if(e.getSource().equals(board[y][x])) {//if a board button is clicked
+					if(setUpStatus) {
+						originalSpot = board[y][x];
+						//if it is a valid spot on the board for the setUp, add the image to the button
+					}else {
+						if(clicks % 1 == 0){//if clicks are even (means this click is where player wants to move)
+							//check if this is a valid spot on the board
+							//check if pushing or pulling will occur
+							//check if trapping will happen for any pieces
+							//change the background of that button and remove the background of the original spot
+							clicks++;
+						}else {//clicks are odd (means this is the original position, the piece to move
+							//check if this is the players piece
+							//highlight
+							clicks++;
+						}
+					}
+				}
+			}
 		}
 		
 	}
