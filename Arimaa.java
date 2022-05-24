@@ -23,13 +23,18 @@ public class Arimaa implements ActionListener{
 	JLabel elephantP1 = new JLabel();
 	JLabel camelP1 = new JLabel();
 	JLabel horseP1 = new JLabel();
+	JLabel dogP1 = new JLabel();
+	JLabel catP1 = new JLabel();
+	JLabel rabbitP1 = new JLabel();
 	
-	
-
 	Container east = new Container();
 	JButton player2 = new JButton("Player 2");
-	
-	
+	JLabel elephantP2 = new JLabel();
+	JLabel camelP2 = new JLabel();
+	JLabel horseP2 = new JLabel();
+	JLabel dogP2 = new JLabel();
+	JLabel catP2 = new JLabel();
+	JLabel rabbitP2 = new JLabel();
 	
 	int PLAYER_ONE = 1;
 	int PLAYER_TWO = 2;
@@ -39,18 +44,47 @@ public class Arimaa implements ActionListener{
 
 	public Arimaa() {
 		//Image resizing elephant
-		ImageIcon elephantImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png");
+		ImageIcon elephantImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
 		Image eImage = elephantImg.getImage();
 		Image newEImage = eImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		elephantImg = new ImageIcon(newEImage);
 		
 		//Image resizing camel
+		ImageIcon camelImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		Image cImage = camelImg.getImage();
+		Image newCImage = cImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		camelImg = new ImageIcon(newCImage);
+		
+		//Image resizing horse
+		ImageIcon horseImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		Image eImage = horseImg.getImage();
+		Image newHImage = hImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		horseImg = new ImageIcon(newHImage);
+		
+		//Image resizing dog
+		ImageIcon dogImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		Image dImage = dogImg.getImage();
+		Image newDImage = dImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		dogImg = new ImageIcon(newDImage);
+		
+		//Image resizing cat
+		ImageIcon catImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		Image cImage = catImg.getImage();
+		Image newCImage = cImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		catImg = new ImageIcon(newCImage);
+		
+		//Image resizing rabbit
+		ImageIcon rabbitImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		Image rImage = rabbitImg.getImage();
+		Image newRImage = rImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		rabbitImg = new ImageIcon(newRImage);
 		
 		
 		//Frame layout
 		panel.setSize(800, 800);
 		panel.setLayout(new BorderLayout());
 
+		
 		//center layout
 		center.setLayout(new GridLayout(8,8));
 		for(int y = 0; y < board.length; y++){
@@ -68,27 +102,42 @@ public class Arimaa implements ActionListener{
 		
 		panel.add(center, BorderLayout.CENTER);
 
+		
 		//west layout
-		west.setLayout(new GridLayout(9, 1));
+		west.setLayout(new GridLayout(9, 3));
 		west.add(player1);
 		player1.addActionListener(this);
 		elephantP1.setIcon(elephantImg);
 		west.add(elephantP1);
+		camelP1.setIcon(camelImg);
+		west.add(camelP1);
+		horseP1.setIcon(horseImg);
+		west.add(horseP1);
+		dogP1.setIcon(dogImg);
+		west.add(dogP1);
+		catP1.setIcon(catImg);
+		west.add(catP1);
+		rabbitP1.setIcon(rabbitImg);
+		west.add(rabbitP1);
 		panel.add(west, BorderLayout.WEST);
 		
-		/*west.add(camelP1);
-		camelP1.addActionListener(this);
-		west.add(horseP1);
-		horseP1.addActionListener(this);
-		west.add(horse2P1);
-		horse2P1.addActionListener(this);*/
-
+	
 		//east Layout
 		east.setLayout(new GridLayout(9, 3));
 		east.add(player2);
 		player1.addActionListener(this);
-		elephantP1.setIcon(elephantImg);
-		east.add(elephantP1);
+		elephantP2.setIcon(elephantImg);
+		west.add(elephantP2);
+		camelP2.setIcon(camelImg);
+		west.add(camelP2);
+		horseP2.setIcon(horseImg);
+		west.add(horseP2);
+		dogP2.setIcon(dogImg);
+		west.add(dogP2);
+		catP2.setIcon(catImg);
+		west.add(catP2);
+		rabbitP2.setIcon(rabbitImg);
+		west.add(rabbitP2);
 		panel.add(east, BorderLayout.EAST);
 
 		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
