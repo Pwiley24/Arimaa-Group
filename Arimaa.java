@@ -12,6 +12,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 
 public class Arimaa implements ActionListener{
 	JFrame panel = new JFrame("Arimaa");
@@ -40,45 +41,63 @@ public class Arimaa implements ActionListener{
 	int PLAYER_TWO = 2;
 	int turn = 0;
 	boolean setUpStatus = false;
+	int piece = 0;
+	int ELEPHANT = 1;
+	int CAMEL = 2;
+	int HORSE = 3;
+	int DOG = 4;
+	int CAT = 5;
+	int RABBIT =6;
+	int eleCount = 0;
+	int camelCount = 0;
+	int horseCount = 0;
+	int dogCount = 0;
+	int catCount = 0;
+	int rabCount = 0;
 	
 
 	public Arimaa() {
+		/*
+		 * I used code from stackoverflow.com
+		 * URL: https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon
+		 * I used this code to resize my Jlabel images to fit better in the JFrame.
+		 */
 		//Image resizing elephant
-		ImageIcon elephantImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		ImageIcon elephantImg = new ImageIcon("Images/elephantImg-removebg-preview.png"); //need to fix this ask
 		Image eImage = elephantImg.getImage();
 		Image newEImage = eImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		elephantImg = new ImageIcon(newEImage);
 		
 		//Image resizing camel
-		ImageIcon camelImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		ImageIcon camelImg = new ImageIcon("C:\\Users\\398256\\eclipse\\Arima Project\\camelImg-removebg-preview.png"); //need to fix this ask
 		Image cImage = camelImg.getImage();
 		Image newCImage = cImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		camelImg = new ImageIcon(newCImage);
 		
 		//Image resizing horse
-		ImageIcon horseImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
-		Image eImage = horseImg.getImage();
+		ImageIcon horseImg = new ImageIcon("C:\\Users\\398256\\eclipse\\Arima Project\\horseImg-removebg-preview.png"); //need to fix this ask
+		Image hImage = horseImg.getImage();
 		Image newHImage = hImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		horseImg = new ImageIcon(newHImage);
 		
 		//Image resizing dog
-		ImageIcon dogImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		ImageIcon dogImg = new ImageIcon("C:\\Users\\398256\\eclipse\\Arima Project\\dogImg-removebg-preview.png"); //need to fix this ask
 		Image dImage = dogImg.getImage();
 		Image newDImage = dImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		dogImg = new ImageIcon(newDImage);
 		
 		//Image resizing cat
-		ImageIcon catImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
-		Image cImage = catImg.getImage();
-		Image newCImage = cImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+		ImageIcon catImg = new ImageIcon("C:\\Users\\398256\\eclipse\\Arima Project\\catImg-removebg-preview"); //need to fix this ask
+		Image catImage = catImg.getImage();
+		Image newCatImage = catImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		catImg = new ImageIcon(newCImage);
 		
 		//Image resizing rabbit
-		ImageIcon rabbitImg = new ImageIcon("C:\\Users\\398256\\Downloads\\elephantImg-removebg-preview.png"); //need to fix this ask
+		ImageIcon rabbitImg = new ImageIcon("C:\\Users\\398256\\eclipse\\Arima Project\\rabbitImg-removebg-preview.png"); //need to fix this ask
 		Image rImage = rabbitImg.getImage();
 		Image newRImage = rImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
 		rabbitImg = new ImageIcon(newRImage);
-		
+	
 		
 		//Frame layout
 		panel.setSize(800, 800);
@@ -167,8 +186,13 @@ public class Arimaa implements ActionListener{
 			for(int x = 0; x < board.length; x++) {
 				if(e.getSource().equals(board[y][x])) {//if a board button is clicked
 					if(setUpStatus) {
+						
 						originalSpot = board[y][x];
 						//if it is a valid spot on the board for the setUp, add the image to the button
+						if(checkValid()) {//if a move is valid 
+							
+						}
+						//change pieces after the one, two, or seven are selected
 					}else {
 						if(clicks % 1 == 0){//if clicks are even (means this click is where player wants to move)
 							//check if this is a valid spot on the board
@@ -188,18 +212,57 @@ public class Arimaa implements ActionListener{
 		
 	}
 	
+	public boolean checkValid() {
+		if (setUpStatus) {//to check if a move is a valid set up move
+			//valid if player one is between x-y
+			//valid if player two is between z-o
+			
+		}else {//to check if a move during the game is valid
+			
+		}
+		return false;
+		
+	}
+	
+	
+	
 	/*
 	 * This method sets up the board pieces by allowing players to only click
 	 * on the first two rows of their side to place their pieces one by one.
 	 */
 	public void setUp() {
 		setUpStatus = true;
-		if(turn == PLAYER_ONE) {
-			//set player one pieces up
-			
-		}else {
-			//set up player two pieces
+		
+		//set players pieces up
+		for(int i = 0; i < 2; i++) {//let both player one and two set up their pieces
+			piece = ELEPHANT;
+			JOptionPane.showMessageDialog(panel, "Place your elephant.");
+			if(piece == ELEPHANT && eleCount == 1) {//once one elephant is placed
+				piece = CAMEL;
+				JOptionPane.showMessageDialog(panel, "Place your camel.");
+			}else if(piece == CAMEL && camelCount == 1) {//once one camel is placed
+				piece = HORSE;
+				JOptionPane.showMessageDialog(panel, "Place your 2 horses.");
+			}else if(piece == HORSE && horseCount == 2) {//once two horses are placed
+				piece = DOG;
+				JOptionPane.showMessageDialog(panel, "Place your 2 dogs.");
+			}else if(piece == DOG && dogCount == 2) {//once two dogs are placed
+				piece = CAT;
+				JOptionPane.showMessageDialog(panel, "Place your 2 cats.");
+			}else if(piece == CAT && catCount == 2) {//once two cats are placed
+				piece = RABBIT;
+				JOptionPane.showMessageDialog(panel, "Place your 7 rabbits.");
+			}else if(piece == RABBIT && rabCount == 7) {//once seven rabbits are placed
+				if(turn == PLAYER_ONE) {
+					turn = PLAYER_TWO;
+				}else {
+					turn = PLAYER_ONE;
+				}
+			}
 		}
+		
+		setUpStatus = false;
+			
 	}
 
 }
