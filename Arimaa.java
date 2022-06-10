@@ -65,6 +65,10 @@ public class Arimaa implements ActionListener{
 	int catCount = 0;
 	int rabCount = 0;
 	int clicks = 0;
+	int originalX = 0;
+	int originalY = 0;
+	int newX = 0;
+	int newY = 0;
 	int timesThroughSetup = 0;
 	boolean makingMove = false;
 	
@@ -218,8 +222,9 @@ public class Arimaa implements ActionListener{
 				if(e.getSource().equals(board[y][x])) {//if a board button is clicked
 					if(setUpStatus) {
 						originalSpot = board[y][x];
+						originalY = y;
 						//if it is a valid spot on the board for the setUp, add the image to the button
-						if(checkValid(y, originalSpot)) {//if a move is valid
+						if(checkValid(originalSpot)) {//if a move is valid
 							if(clicks == 0) {//change background of button to an elephant
 								originalSpot.setIcon(elephantImg);
 								originalSpot.setText(playerTurn + "e");
@@ -296,7 +301,13 @@ public class Arimaa implements ActionListener{
 					}else {//setup status = false
 						if(clicks == 0){//if first click is made it is selecting the piece to move
 							System.out.println("first click");
-							checkValid(y, originalSpot);
+							originalX = x;
+							originalY = y;
+							System.out.println(newY + "y");
+							System.out.println(newX + "x");
+							System.out.println(originalY + "oy");
+							System.out.println(originalX + "ox");
+							checkValid(originalSpot);
 							//check if pushing or pulling will occur
 							//check if trapping will happen for any pieces
 							//change the background of that button and remove the background of the original spot
@@ -304,8 +315,14 @@ public class Arimaa implements ActionListener{
 						}else if(clicks == 1){//if second click is made it is selecting the position to move the original piece to
 							System.out.println("second click");
 							newSpot = board[y][x];
+							newY = y;
+							newX = x;
+							System.out.println(newY + "y");
+							System.out.println(newX + "x");
+							System.out.println(originalY + "oy");
+							System.out.println(originalX + "ox");
 							makingMove = true;
-							if(checkValid(y, newSpot)) {//if it is a valid move
+							if(checkValid(newSpot)) {//if it is a valid move
 								System.out.println("was valid");
 								if(originalSpot.getText().equals("1e") ||
 									originalSpot.getText().equals("2e")) {
@@ -344,21 +361,31 @@ public class Arimaa implements ActionListener{
 		}
 		
 	}
+	/*
+	
+	public int getOriginalX(JButton[][] coordinates) {
+		for(int x = 0; x < coordinates.length; x++) {
+			for(int y = 0; y < coordinates.length; y++) {
+				if()
+			}
+		}
+	}
+	*/
 	
 	
 	
-	public boolean checkValid(int yVal, int xVal, JButton placement, JButton newPlacement) {
+	public boolean checkValid(JButton placement) {
 		if (setUpStatus) {//to check if a move is a valid set up move
 			if(turn == PLAYER_ONE) { //valid player one set up
-				if(yVal == 6 ||
-				   yVal == 7) {
+				if(originalY == 6 ||
+				   originalY == 7) {
 					if(placement.getIcon() == null) {
 						return true;
 					}
 				}
 			}else {//valid player two set up
-				if(yVal == 0 ||
-					yVal == 1) {
+				if(originalY == 0 ||
+					originalY == 1) {
 					if(placement.getIcon() == null) {
 						return true;
 					}
@@ -376,25 +403,80 @@ public class Arimaa implements ActionListener{
 						return true;
 					}
 				}else {//you are making a move
-					if(placement.getText().equals("1e") ||
-						placement.getText().equals("1c") ||
-						placement.getText().equals("1h") ||
-						placement.getText().equals("1d") ||
-						placement.getText().equals("1ca")) {//for all pieces that can move backwards
-						
-					}else {//rabbit can't move back
-						if(yVal + 1 == )
+					if(placement.getIcon() == null) {
+						if(placement.getText().equals("1e") ||
+							placement.getText().equals("1c") ||
+							placement.getText().equals("1h") ||
+							placement.getText().equals("1d") ||
+							placement.getText().equals("1ca")) {//for all pieces that can move backwards
+							System.out.println("addy " + (originalY + 1));
+							System.out.println("minusy " + (originalY - 1));
+							if(originalY + 1 == newY ||
+								originalY - 1 == newY ||
+								originalX + 1 == newX ||
+								originalX - 1 == newX) {//if the move was to the left right down or up one
+								System.out.println("elephant move valid");
+									return true;
+							}else {
+								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, up, or down.");
+							}
+							
+						}else {//rabbit can't move back
+							if(originalY + 1 == newY ||
+								originalX + 1 == newX ||
+								originalX - 1 == newX) {//if the move was to the left right or up one
+								System.out.println("rabbit move valid");
+									return true;
+							}else {
+								//rubnning here
+								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, or up.");
+							}
+						}
+					}else {
+						JOptionPane.showMessageDialog(panel, "You can't push that piece.");
 					}
 				}
-			}else if(turn == PLAYER_ONE &&
-				placement.getText().equals("2e") ||
-				placement.getText().equals("2c") ||
-				placement.getText().equals("2h") ||
-				placement.getText().equals("2d") ||
-				placement.getText().equals("2ca")||
-				placement.getText().equals("2r") &&
-				makingMove == false) {//if the button pressed has a friendly piece on it
-				return true;
+			}else if(turn == PLAYER_TWO) {
+				if(makingMove == false) {
+					if(placement.getText().equals("2e") ||
+					placement.getText().equals("2c") ||
+					placement.getText().equals("2h") ||
+					placement.getText().equals("2d") ||
+					placement.getText().equals("2ca")||
+					placement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
+						return true;
+					}
+				}else {//you are making a move
+					if(placement.getIcon() == null) {
+						if(placement.getText().equals("2e") ||
+							placement.getText().equals("2c") ||
+							placement.getText().equals("2h") ||
+							placement.getText().equals("2d") ||
+							placement.getText().equals("2ca")) {//for all pieces that can move backwards
+							System.out.println("addy " + (originalY + 1));
+							System.out.println("minusy " + (originalY - 1));
+							if(originalY + 1 == newY ||
+								originalY - 1 == newY ||
+								originalX + 1 == newX ||
+								originalX - 1 == newX) {//if the move was to the left right down or up one
+									return true;
+							}else {
+								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, up, or down.");
+							}
+							
+						}else {//rabbit can't move back
+							if(originalY + 1 == newY ||
+								originalX + 1 == newX ||
+								originalX - 1 == newX) {//if the move was to the left right or up one
+									return true;
+							}else {
+								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, or up.");
+							}
+						}
+					}else {
+						JOptionPane.showMessageDialog(panel, "You can't push that piece.");
+					}
+				}
 			}
 				
 		}
