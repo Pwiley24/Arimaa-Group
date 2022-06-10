@@ -224,7 +224,7 @@ public class Arimaa implements ActionListener{
 						originalSpot = board[y][x];
 						originalY = y;
 						//if it is a valid spot on the board for the setUp, add the image to the button
-						if(checkValid(originalSpot)) {//if a move is valid
+						if(checkValid(originalSpot, newSpot)) {//if a move is valid
 							if(clicks == 0) {//change background of button to an elephant
 								originalSpot.setIcon(elephantImg);
 								originalSpot.setText(playerTurn + "e");
@@ -307,7 +307,7 @@ public class Arimaa implements ActionListener{
 							System.out.println(newX + "x");
 							System.out.println(originalY + "oy");
 							System.out.println(originalX + "ox");
-							checkValid(originalSpot);
+							checkValid(originalSpot, newSpot);
 							//check if pushing or pulling will occur
 							//check if trapping will happen for any pieces
 							//change the background of that button and remove the background of the original spot
@@ -322,7 +322,7 @@ public class Arimaa implements ActionListener{
 							System.out.println(originalY + "oy");
 							System.out.println(originalX + "ox");
 							makingMove = true;
-							if(checkValid(newSpot)) {//if it is a valid move
+							if(checkValid(newSpot, originalSpot)) {//if it is a valid move
 								System.out.println("was valid");
 								if(originalSpot.getText().equals("1e") ||
 									originalSpot.getText().equals("2e")) {
@@ -374,7 +374,7 @@ public class Arimaa implements ActionListener{
 	
 	
 	
-	public boolean checkValid(JButton placement) {
+	public boolean checkValid(JButton placement, JButton oldPlacement) {
 		if (setUpStatus) {//to check if a move is a valid set up move
 			if(turn == PLAYER_ONE) { //valid player one set up
 				if(originalY == 6 ||
@@ -394,21 +394,21 @@ public class Arimaa implements ActionListener{
 		}else {//to check if a move during the game is valid
 			if(turn == PLAYER_ONE) {
 				if(makingMove == false) {
-					if(placement.getText().equals("1e") ||
-					placement.getText().equals("1c") ||
-					placement.getText().equals("1h") ||
-					placement.getText().equals("1d") ||
-					placement.getText().equals("1ca")||
-					placement.getText().equals("1r")) {//if the button pressed has a friendly piece on it
+					if(oldPlacement.getText().equals("1e") ||
+					oldPlacement.getText().equals("1c") ||
+					oldPlacement.getText().equals("1h") ||
+					oldPlacement.getText().equals("1d") ||
+					oldPlacement.getText().equals("1ca")||
+					oldPlacement.getText().equals("1r")) {//if the button pressed has a friendly piece on it
 						return true;
 					}
 				}else {//you are making a move
 					if(placement.getIcon() == null) {
-						if(placement.getText().equals("1e") ||
-							placement.getText().equals("1c") ||
-							placement.getText().equals("1h") ||
-							placement.getText().equals("1d") ||
-							placement.getText().equals("1ca")) {//for all pieces that can move backwards
+						if(oldPlacement.getText().equals("1e") ||
+						    oldPlacement.getText().equals("1c") ||
+						    oldPlacement.getText().equals("1h") ||
+						    oldPlacement.getText().equals("1d") ||
+						    oldPlacement.getText().equals("1ca")) {//for all pieces that can move backwards
 							System.out.println("addy " + (originalY + 1));
 							System.out.println("minusy " + (originalY - 1));
 							if(originalY + 1 == newY ||
@@ -438,21 +438,21 @@ public class Arimaa implements ActionListener{
 				}
 			}else if(turn == PLAYER_TWO) {
 				if(makingMove == false) {
-					if(placement.getText().equals("2e") ||
-					placement.getText().equals("2c") ||
-					placement.getText().equals("2h") ||
-					placement.getText().equals("2d") ||
-					placement.getText().equals("2ca")||
-					placement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
+					if(oldPlacement.getText().equals("2e") ||
+					oldPlacement.getText().equals("2c") ||
+					oldPlacement.getText().equals("2h") ||
+					oldPlacement.getText().equals("2d") ||
+					oldPlacement.getText().equals("2ca")||
+					oldPlacement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
 						return true;
 					}
 				}else {//you are making a move
 					if(placement.getIcon() == null) {
-						if(placement.getText().equals("2e") ||
-							placement.getText().equals("2c") ||
-							placement.getText().equals("2h") ||
-							placement.getText().equals("2d") ||
-							placement.getText().equals("2ca")) {//for all pieces that can move backwards
+						if(oldPlacement.getText().equals("2e") ||
+							oldPlacement.getText().equals("2c") ||
+							oldPlacement.getText().equals("2h") ||
+							oldPlacement.getText().equals("2d") ||
+							oldPlacement.getText().equals("2ca")) {//for all pieces that can move backwards
 							System.out.println("addy " + (originalY + 1));
 							System.out.println("minusy " + (originalY - 1));
 							if(originalY + 1 == newY ||
