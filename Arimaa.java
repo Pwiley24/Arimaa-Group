@@ -43,6 +43,8 @@ public class Arimaa implements ActionListener{
 	
 	Container east = new Container();
 	JButton player2 = new JButton("Player 2");
+	
+	JButton originalSpot = new JButton();
 
 	
 	int PLAYER_ONE = 1;
@@ -203,7 +205,6 @@ public class Arimaa implements ActionListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		JButton originalSpot = new JButton();
 		JButton newSpot = new JButton();
 		if(e.getSource().equals(player1)) {//if player one is going first
 			turn = PLAYER_ONE;
@@ -219,11 +220,13 @@ public class Arimaa implements ActionListener{
 			for(int x = 0; x < board.length; x++) {
 				
 				if(e.getSource().equals(board[y][x])) {//if a board button is clicked
+					
 					if(setUpStatus) {
 						originalSpot = board[y][x];
 						originalY = y;
+						originalX = x;
 						//if it is a valid spot on the board for the setUp, add the image to the button
-						if(checkValid(originalSpot, newSpot)) {//if a move is valid
+						if(checkValid(newSpot, originalSpot)) {//if a move is valid
 							if(clicks == 0) {//change background of button to an elephant
 								originalSpot.setIcon(elephantImg);
 								originalSpot.setText(playerTurn + "e");
@@ -299,19 +302,20 @@ public class Arimaa implements ActionListener{
 						
 					}else {//setup status = false
 						if(clicks == 0){//if first click is made it is selecting the piece to move
-							System.out.println("first click");
-							originalX = x;
+							originalSpot = board[y][x];
 							originalY = y;
-							checkValid(originalSpot, newSpot);
+							originalX = x;
+							System.out.println("first click");
+							checkValid(newSpot, originalSpot);
 							//check if pushing or pulling will occur
 							//check if trapping will happen for any pieces
 							//change the background of that button and remove the background of the original spot
 							clicks++;
 						}else if(clicks == 1){//if second click is made it is selecting the position to move the original piece to
 							System.out.println("second click");
-							newSpot = board[y][x];
-							newY = y;
 							newX = x;
+							newY = y;
+							newSpot = board[y][x];
 							makingMove = true;
 							if(checkValid(newSpot, originalSpot)) {//if it is a valid move
 								System.out.println("was valid");
@@ -360,31 +364,34 @@ public class Arimaa implements ActionListener{
 			if(turn == PLAYER_ONE) { //valid player one set up
 				if(originalY == 6 ||
 				   originalY == 7) {
-					if(placement.getIcon() == null) {
+					if(oldPlacement.getIcon() == null) {
 						return true;
 					}
 				}
 			}else {//valid player two set up
 				if(originalY == 0 ||
 					originalY == 1) {
-					if(placement.getIcon() == null) {
+					if(oldPlacement.getIcon() == null) {
 						return true;
 					}
 				}
 			}
+			
 		}else {//to check if a move during the game is valid
 			if(turn == PLAYER_ONE) {
 				if(makingMove == false) {
-					if(placement.getText().equals("1e") ||
-					placement.getText().equals("1c") ||
-					placement.getText().equals("1h") ||
-					placement.getText().equals("1d") ||
-					placement.getText().equals("1ca")||
-					placement.getText().equals("1r")) {//if the button pressed has a friendly piece on it
+					//check freeze
+					if(oldPlacement.getText().equals("1e") ||
+					oldPlacement.getText().equals("1c") ||
+					oldPlacement.getText().equals("1h") ||
+					oldPlacement.getText().equals("1d") ||
+					oldPlacement.getText().equals("1ca")||
+					oldPlacement.getText().equals("1r")) {//if the button pressed has a friendly piece on it
 						return true;
 					}
 				}else {//you are making a move
 					if(placement.getIcon() == null) {
+						System.out.println(oldPlacement.getText() + " old text");
 						if(oldPlacement.getText().equals("1e") ||
 						    oldPlacement.getText().equals("1c") ||
 						    oldPlacement.getText().equals("1h") ||
@@ -419,12 +426,12 @@ public class Arimaa implements ActionListener{
 				}
 			}else if(turn == PLAYER_TWO) {
 				if(makingMove == false) {
-					if(placement.getText().equals("2e") ||
-					placement.getText().equals("2c") ||
-					placement.getText().equals("2h") ||
-					placement.getText().equals("2d") ||
-					placement.getText().equals("2ca")||
-					placement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
+					if(oldPlacement.getText().equals("2e") ||
+					oldPlacement.getText().equals("2c") ||
+					oldPlacement.getText().equals("2h") ||
+					oldPlacement.getText().equals("2d") ||
+					oldPlacement.getText().equals("2ca")||
+					oldPlacement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
 						return true;
 					}
 				}else {//you are making a move
