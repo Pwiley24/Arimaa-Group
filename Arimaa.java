@@ -1,7 +1,6 @@
 package arimaaProject;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.Image;
@@ -303,10 +302,6 @@ public class Arimaa implements ActionListener{
 							System.out.println("first click");
 							originalX = x;
 							originalY = y;
-							System.out.println(newY + "y");
-							System.out.println(newX + "x");
-							System.out.println(originalY + "oy");
-							System.out.println(originalX + "ox");
 							checkValid(originalSpot, newSpot);
 							//check if pushing or pulling will occur
 							//check if trapping will happen for any pieces
@@ -317,10 +312,6 @@ public class Arimaa implements ActionListener{
 							newSpot = board[y][x];
 							newY = y;
 							newX = x;
-							System.out.println(newY + "y");
-							System.out.println(newX + "x");
-							System.out.println(originalY + "oy");
-							System.out.println(originalX + "ox");
 							makingMove = true;
 							if(checkValid(newSpot, originalSpot)) {//if it is a valid move
 								System.out.println("was valid");
@@ -361,16 +352,6 @@ public class Arimaa implements ActionListener{
 		}
 		
 	}
-	/*
-	
-	public int getOriginalX(JButton[][] coordinates) {
-		for(int x = 0; x < coordinates.length; x++) {
-			for(int y = 0; y < coordinates.length; y++) {
-				if()
-			}
-		}
-	}
-	*/
 	
 	
 	
@@ -394,12 +375,12 @@ public class Arimaa implements ActionListener{
 		}else {//to check if a move during the game is valid
 			if(turn == PLAYER_ONE) {
 				if(makingMove == false) {
-					if(oldPlacement.getText().equals("1e") ||
-					oldPlacement.getText().equals("1c") ||
-					oldPlacement.getText().equals("1h") ||
-					oldPlacement.getText().equals("1d") ||
-					oldPlacement.getText().equals("1ca")||
-					oldPlacement.getText().equals("1r")) {//if the button pressed has a friendly piece on it
+					if(placement.getText().equals("1e") ||
+					placement.getText().equals("1c") ||
+					placement.getText().equals("1h") ||
+					placement.getText().equals("1d") ||
+					placement.getText().equals("1ca")||
+					placement.getText().equals("1r")) {//if the button pressed has a friendly piece on it
 						return true;
 					}
 				}else {//you are making a move
@@ -438,12 +419,12 @@ public class Arimaa implements ActionListener{
 				}
 			}else if(turn == PLAYER_TWO) {
 				if(makingMove == false) {
-					if(oldPlacement.getText().equals("2e") ||
-					oldPlacement.getText().equals("2c") ||
-					oldPlacement.getText().equals("2h") ||
-					oldPlacement.getText().equals("2d") ||
-					oldPlacement.getText().equals("2ca")||
-					oldPlacement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
+					if(placement.getText().equals("2e") ||
+					placement.getText().equals("2c") ||
+					placement.getText().equals("2h") ||
+					placement.getText().equals("2d") ||
+					placement.getText().equals("2ca")||
+					placement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
 						return true;
 					}
 				}else {//you are making a move
