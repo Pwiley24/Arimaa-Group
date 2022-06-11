@@ -49,6 +49,7 @@ public class Arimaa implements ActionListener{
 	
 	int PLAYER_ONE = 1;
 	int PLAYER_TWO = 2;
+	int movesMade = 0;
 	int turn = 0;
 	String playerTurn = null;
 	boolean setUpStatus = false;
@@ -305,20 +306,17 @@ public class Arimaa implements ActionListener{
 							originalSpot = board[y][x];
 							originalY = y;
 							originalX = x;
-							System.out.println("first click");
 							checkValid(newSpot, originalSpot);
 							//check if pushing or pulling will occur
 							//check if trapping will happen for any pieces
 							//change the background of that button and remove the background of the original spot
 							clicks++;
 						}else if(clicks == 1){//if second click is made it is selecting the position to move the original piece to
-							System.out.println("second click");
 							newX = x;
 							newY = y;
 							newSpot = board[y][x];
 							makingMove = true;
 							if(checkValid(newSpot, originalSpot)) {//if it is a valid move
-								System.out.println("was valid");
 								if(originalSpot.getText().equals("1e") ||
 									originalSpot.getText().equals("2e")) {
 									newSpot.setIcon(elephantImg);
@@ -346,9 +344,30 @@ public class Arimaa implements ActionListener{
 								}
 								originalSpot.setIcon(null);
 								originalSpot.setText("");
-								clicks = 0;
-								makingMove = false;
+								movesMade++;
+								if(movesMade < 4) {
+									int answer = JOptionPane.showConfirmDialog(panel, "Would you like to make another move?");
+									if(answer == JOptionPane.NO_OPTION) {
+										JOptionPane.showMessageDialog(panel, "Next player's turn.");
+										if(turn == PLAYER_ONE) {
+											turn = PLAYER_TWO;
+										}else {
+											turn = PLAYER_ONE;
+										}
+									}
+								}else {
+									JOptionPane.showMessageDialog(panel, "Next player's turn.");
+									movesMade = 0;
+									if(turn == PLAYER_ONE) {
+										turn = PLAYER_TWO;
+									}else {
+										turn = PLAYER_ONE;
+									}
+								}
+								
 							}
+							clicks = 0;
+							makingMove = false;
 						}
 					}
 				}
@@ -391,34 +410,50 @@ public class Arimaa implements ActionListener{
 					}
 				}else {//you are making a move
 					if(placement.getIcon() == null) {
-						System.out.println(oldPlacement.getText() + " old text");
 						if(oldPlacement.getText().equals("1e") ||
 						    oldPlacement.getText().equals("1c") ||
 						    oldPlacement.getText().equals("1h") ||
 						    oldPlacement.getText().equals("1d") ||
 						    oldPlacement.getText().equals("1ca")) {//for all pieces that can move backwards
-							System.out.println("addy " + (originalY + 1));
-							System.out.println("minusy " + (originalY - 1));
 							if(originalY + 1 == newY ||
-								originalY - 1 == newY ||
-								originalX + 1 == newX ||
-								originalX - 1 == newX) {//if the move was to the left right down or up one
-								System.out.println("elephant move valid");
+								originalY - 1 == newY) {//if move was up or down one
+								if(originalX + 1 != newX &&
+									originalX - 1 != newX) {//no diagonals
 									return true;
+								}else {
+									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
+								}
+							}else if(originalX + 1 == newX ||
+									originalX - 1 == newX) {//if the move was to the left or right one
+								if(originalY + 1 != newY &&
+									originalY - 1 != newY) {//no diagonals
+									return true;
+								}else {
+									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
+								}
 							}else {
 								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, up, or down.");
 							}
 							
-						}else {//rabbit can't move back
-							if(originalY + 1 == newY ||
-								originalX + 1 == newX ||
-								originalX - 1 == newX) {//if the move was to the left right or up one
-								System.out.println("rabbit move valid");
+						}else if(oldPlacement.getText().equals("1r")){//rabbit can't move back
+							if(originalY - 1 == newY) {//if move was up one
+								if(originalX + 1 != newX &&
+									originalX - 1 != newX) {//no diagonals
 									return true;
+								}
+							}else if(originalX + 1 == newX ||
+									originalX - 1 == newX) {//if the move was to the left or right one
+								if(originalY - 1 != newY) {//no diagonals
+									return true;
+								}else {
+									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
+								}
 							}else {
-								//rubnning here
-								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, or up.");
+							
+								JOptionPane.showMessageDialog(panel, "Rabbit can only move one jump left, right, or up.");
 							}
+						}else {
+							JOptionPane.showMessageDialog(panel, "It's not your turn.");
 						}
 					}else {
 						JOptionPane.showMessageDialog(panel, "You can't push that piece.");
@@ -441,25 +476,46 @@ public class Arimaa implements ActionListener{
 							oldPlacement.getText().equals("2h") ||
 							oldPlacement.getText().equals("2d") ||
 							oldPlacement.getText().equals("2ca")) {//for all pieces that can move backwards
-							System.out.println("addy " + (originalY + 1));
-							System.out.println("minusy " + (originalY - 1));
 							if(originalY + 1 == newY ||
-								originalY - 1 == newY ||
-								originalX + 1 == newX ||
-								originalX - 1 == newX) {//if the move was to the left right down or up one
+								originalY - 1 == newY) {//if move was up or down one
+								if(originalX + 1 != newX &&
+									originalX - 1 != newX) {//no diagonals
 									return true;
+								}else {
+									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
+								}
+							}else if(originalX + 1 == newX ||
+									originalX - 1 == newX) {//if the move was to the left or right one
+								if(originalY + 1 != newY &&
+									originalY - 1 != newY) {//no diagonals
+									return true;
+								}else {
+									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
+								}
 							}else {
 								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, up, or down.");
 							}
 							
-						}else {//rabbit can't move back
-							if(originalY + 1 == newY ||
-								originalX + 1 == newX ||
-								originalX - 1 == newX) {//if the move was to the left right or up one
+						}else if(oldPlacement.getText().equals("2r")){//rabbit can't move back
+							if(originalY + 1 == newY) {//if move was up one
+								if(originalX + 1 != newX &&
+									originalX - 1 != newX) {//no diagonal
 									return true;
+								}else {
+									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
+								}
+							}else if(originalX + 1 == newX ||
+									originalX - 1 == newX) {//if the move was to the left right one
+								if(originalY + 1 != newY) {//no diagonal
+									return true;
+								}else {
+									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
+								}
 							}else {
-								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, or up.");
+								JOptionPane.showMessageDialog(panel, "Rabbits can only move one jump left, right, or up.");
 							}
+						}else {
+							JOptionPane.showMessageDialog(panel, "It's not your turn.");
 						}
 					}else {
 						JOptionPane.showMessageDialog(panel, "You can't push that piece.");
