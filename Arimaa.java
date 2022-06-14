@@ -1,3 +1,52 @@
+    
+        //also need to take into account the pushing and pulling pieces
+        if(isTrap(to)) {//if the to button is in a trap
+    		if(!checkForFriends(to)) {
+    			to.reset();
+    		}
+    	}
+        
+
+        return false;
+    }
+    
+    
+    
+ 
+    
+    
+   
+    
+    /*
+     * To check if the piece selected has a friendly piece adjacent
+     * Check each adjacent spot and if there is a piece with the same background return true.
+     */
+    public boolean checkForFriends(BoardButton spot) {
+    	boolean res = false;
+    	if(spot.x + 1 <= 7) { //if the spot is not outside of the board
+    		if(spot.player == board[spot.y][spot.x+1].player) {//if they are on the same team
+    			res = true;
+    		}
+    	}
+    	if(spot.x - 1 >= 0) {//if the spot is not outside the board
+    		if(spot.player == board[spot.y][spot.x-1].player) {
+    			res = true;
+    		}
+    	}
+    	if(spot.y + 1 <= 7) {//if spot is not outside board
+    		if(spot.player == board[spot.y + 1][spot.x].player) {
+    			res = true;
+    		}
+    	}
+    	if(spot.y - 1 >= 0) {//if spot is not outside board
+    		if(spot.player == board[spot.y - 1][spot.x].player) {
+    			res = true;
+    		}
+    	}
+
+    	return res;
+    }
+
 package arimaaProject;
 
 import java.awt.*;
