@@ -1,542 +1,468 @@
 package arimaaProject;
 
-import java.awt.BorderLayout;
-import java.awt.Container;
-import java.awt.GridLayout;
-import java.awt.Image;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
+import javax.swing.*;
 
-public class Arimaa implements ActionListener{
-	JFrame panel = new JFrame("Arimaa");
-	Container center = new Container();
-	JButton[][] board = new JButton[8][8];
+public class ArimaaMain implements ActionListener {
 
-	Container west = new Container();
-	JButton player1 = new JButton("Player 1");
-	
-	Container south = new Container();
-	JLabel elephant = new JLabel();
-	JLabel camel = new JLabel();
-	JLabel horse = new JLabel();
-	JLabel horse_2 = new JLabel();
-	JLabel dog = new JLabel();
-	JLabel dog_2 = new JLabel();
-	JLabel cat = new JLabel();
-	JLabel cat_2 = new JLabel();
-	JLabel rabbit = new JLabel();
-	JLabel rabbit_2 = new JLabel();
-	JLabel rabbit_3 = new JLabel();
-	JLabel rabbit_4 = new JLabel();
-	JLabel rabbit_5 = new JLabel();
-	JLabel rabbit_6 = new JLabel();
-	JLabel rabbit_7 = new JLabel();
-	JLabel rabbit_8 = new JLabel();
-	JLabel empty1 = new JLabel();
-	JLabel empty2 = new JLabel();
-	
-	Container east = new Container();
-	JButton player2 = new JButton("Player 2");
-	
-	JButton originalSpot = new JButton();
+    enum Player {
+        GOLD, SILVER, NONE;
+    }
 
-	
-	int PLAYER_ONE = 1;
-	int PLAYER_TWO = 2;
-	int movesMade = 0;
-	int turn = 0;
-	String playerTurn = null;
-	boolean setUpStatus = false;
-	int piece = 0;
-	int ELEPHANT = 1;
-	int CAMEL = 2;
-	int HORSE = 3;
-	int DOG = 4;
-	int CAT = 5;
-	int RABBIT =6;
-	int eleCount = 0;
-	int camelCount = 0;
-	int horseCount = 0;
-	int dogCount = 0;
-	int catCount = 0;
-	int rabCount = 0;
-	int clicks = 0;
-	int originalX = 0;
-	int originalY = 0;
-	int newX = 0;
-	int newY = 0;
-	int timesThroughSetup = 0;
-	boolean makingMove = false;
-	
-	//Image variables for pieces:
-	ImageIcon elephantImg = new ImageIcon("Images/elephant.png");
-	ImageIcon camelImg = new ImageIcon("Images/camel.png"); 
-	ImageIcon horseImg = new ImageIcon("Images/horse.png"); 
-	ImageIcon dogImg = new ImageIcon("Images/dog.png");
-	ImageIcon catImg = new ImageIcon("Images/cat.png");
-	ImageIcon rabbitImg = new ImageIcon("Images/rabbit.png"); 
-	
+    enum Piece {
+        RABBIT(1), CAT(2), DOG(3), HORSE(4), CAMEL(5), ELEPHANT(6), NONE(0);
 
-	public Arimaa() {
-		/*
-		 * I used code from stackoverflow.com
-		 * URL: https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon
-		 * I used this code to resize my Jlabel images to fit better in the JFrame.
-		 */
-		//Image resizing elephant
-		Image eImage = elephantImg.getImage();
-		Image newEImage = eImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-		elephantImg = new ImageIcon(newEImage);
-		
-		//Image resizing camel
-		Image cImage = camelImg.getImage();
-		Image newCImage = cImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-		camelImg = new ImageIcon(newCImage);
-		
-		//Image resizing horse
-		Image hImage = horseImg.getImage();
-		Image newHImage = hImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-		horseImg = new ImageIcon(newHImage);
-		
-		//Image resizing dog
-		Image dImage = dogImg.getImage();
-		Image newDImage = dImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-		dogImg = new ImageIcon(newDImage);
-		
-		//Image resizing cat
-		Image catImage = catImg.getImage();
-		Image newCatImage = catImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-		catImg = new ImageIcon(newCatImage);
-		
-		//Image resizing rabbit
-		Image rImage = rabbitImg.getImage();
-		Image newRImage = rImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
-		rabbitImg = new ImageIcon(newRImage);
-	
-		
-		//Frame layout
-		panel.setSize(800, 800);
-		panel.setLayout(new BorderLayout());
+        public final int strength;
+        public final boolean isFrozen = false;
 
-		
-		//center layout
-		center.setLayout(new GridLayout(8,8));
-		for(int y = 0; y < board.length; y++){
-			for(int x = 0; x < board.length; x++){
-				board[y][x] = new JButton();
-				if(y == 2 || y == 5){
-					if(x == 2 || x == 5){
-						//set background of button to red
-					}
-	}
-				center.add(board[y][x]);
-				board[y][x].addActionListener(this);
-			}
-		}
-		
-		panel.add(center, BorderLayout.CENTER);
+        Piece(int strength) {
+            this.strength = strength;
+        }
+    }
 
-		
-		//west layout
-		west.setLayout(new GridLayout(1,1));
-		west.add(player1);
-		player1.addActionListener(this);
-		panel.add(west, BorderLayout.WEST);
-		
-		//south layout
-		south.setLayout(new GridLayout(2,10));
-		elephant.setIcon(elephantImg);
-		south.add(elephant);
-		camel.setIcon(camelImg);
-		south.add(camel);
-		horse.setIcon(horseImg);
-		south.add(horse);
-		dog.setIcon(dogImg);
-		south.add(dog);
-		cat.setIcon(catImg);
-		south.add(cat);
-		rabbit.setIcon(rabbitImg);
-		south.add(rabbit);
-		rabbit_2.setIcon(rabbitImg);
-		south.add(rabbit_2);
-		rabbit_3.setIcon(rabbitImg);
-		south.add(rabbit_3);
-		rabbit_4.setIcon(rabbitImg);
-		south.add(rabbit_4);
-		
-		south.add(empty1);//next row
-		south.add(empty2);
-		horse_2.setIcon(horseImg);
-		south.add(horse_2);
-		dog_2.setIcon(dogImg);
-		south.add(dog_2);
-		cat_2.setIcon(catImg);
-		south.add(cat_2);
-		rabbit_5.setIcon(rabbitImg);
-		south.add(rabbit_5);
-		rabbit_6.setIcon(rabbitImg);
-		south.add(rabbit_6);
-		rabbit_7.setIcon(rabbitImg);
-		south.add(rabbit_7);
-		rabbit_8.setIcon(rabbitImg);;
-		south.add(rabbit_8);
-		panel.add(south, BorderLayout.SOUTH);
-		
-	
-		//east Layout
-		east.setLayout(new GridLayout(1,1));
-		east.add(player2);
-		player2.addActionListener(this);
-		panel.add(east, BorderLayout.EAST);
+    enum GameState {
+        GOLD_SETUP, SILVER_SETUP, GOLD_TURN, SILVER_TURN, GOLD_WIN, SILVER_WIN;
+    }
 
-		panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		panel.setVisible(true);
-	}
-	
-	public static void main(String[] args) {
-		new Arimaa();
+    class BoardButton extends JButton {
 
-	}
+        public Player player = Player.NONE;
+        public Piece piece = Piece.NONE;
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		JButton newSpot = new JButton();
-		if(e.getSource().equals(player1)) {//if player one is going first
-			turn = PLAYER_ONE;
-			setUp();
-		}else if(e.getSource().equals(player2)) {//if player two is going first
-			turn = PLAYER_TWO;
-			setUp();
-		}
-		playerTurn = String.valueOf(turn);
-		
-		
-		for(int y = 0; y < board.length; y++) {
-			for(int x = 0; x < board.length; x++) {
-				
-				if(e.getSource().equals(board[y][x])) {//if a board button is clicked
-					
-					if(setUpStatus) {
-						originalSpot = board[y][x];
-						originalY = y;
-						originalX = x;
-						//if it is a valid spot on the board for the setUp, add the image to the button
-						if(checkValid(newSpot, originalSpot)) {//if a move is valid
-							if(clicks == 0) {//change background of button to an elephant
-								originalSpot.setIcon(elephantImg);
-								originalSpot.setText(playerTurn + "e");
-								clicks++;
-								JOptionPane.showMessageDialog(panel, "Player, place your camel.");
-							}else if(clicks == 1) {//change button to camel
-								originalSpot.setIcon(camelImg);
-								originalSpot.setText(playerTurn + "c");
-								clicks++;
-								JOptionPane.showMessageDialog(panel, "Player, place your horses.");
-							}else if(clicks == 2 ||
-									clicks == 3) {//change button to horse for two clicks
-								originalSpot.setIcon(horseImg);
-								originalSpot.setText(playerTurn + "h");
-								if(clicks == 3) {
-									JOptionPane.showMessageDialog(panel, "Player, place your dogs.");
-								}
-								clicks++;
-							}else if(clicks == 4 ||
-									clicks == 5) {//change button to dog for two clicks
-								originalSpot.setIcon(dogImg);
-								originalSpot.setText(playerTurn + "d");
-								if(clicks == 5) {
-									JOptionPane.showMessageDialog(panel, "Player, place your cats.");
-								}
-								clicks++;
-							}else if(clicks == 6 ||
-									clicks == 7) {//change button to cat for two clicks
-								originalSpot.setIcon(catImg);
-								originalSpot.setText(playerTurn + "ca");
-								if(clicks == 7) {
-									JOptionPane.showMessageDialog(panel, "Player, place your rabbits.");
-								}
-								clicks++;
-							}else if(clicks == 8 ||
-									clicks == 9 ||
-									clicks == 10 ||
-									clicks == 11 ||
-									clicks ==12 ||
-									clicks == 13 ||
-									clicks == 14 ||
-									clicks == 15) {//change button to rabbit for seven clicks
-								originalSpot.setIcon(rabbitImg);
-								originalSpot.setText(playerTurn + "r");
-								if(clicks == 15) { // if that was the last placement reset clicks for next player or start of game
-									clicks = 0;
-									if(turn == PLAYER_ONE) {
-										turn = PLAYER_TWO;
-									}else {
-										turn = PLAYER_ONE;
-									}
-									timesThroughSetup++;
-									if(timesThroughSetup == 1) {
-										JOptionPane.showMessageDialog(panel, "Next player, place your elephant.");
-									}else if(timesThroughSetup ==2) {
-										setUpStatus = false;
-										if(turn == PLAYER_ONE) {
-											JOptionPane.showMessageDialog(panel, "Time to start the game! Player one make your move!");
-										}else {
-											JOptionPane.showMessageDialog(panel, "Time to start the game! Player two make your move!");
-											
-										}
-									}
-								}else {
-									clicks ++;
-								}
-							}
-							
-							
-						}else {
-							JOptionPane.showMessageDialog(panel, "Place a valid move.");
-						}
-						
-					}else {//setup status = false
-						if(clicks == 0){//if first click is made it is selecting the piece to move
-							originalSpot = board[y][x];
-							originalY = y;
-							originalX = x;
-							checkValid(newSpot, originalSpot);
-							//check if pushing or pulling will occur
-							//check if trapping will happen for any pieces
-							//change the background of that button and remove the background of the original spot
-							clicks++;
-						}else if(clicks == 1){//if second click is made it is selecting the position to move the original piece to
-							newX = x;
-							newY = y;
-							newSpot = board[y][x];
-							makingMove = true;
-							if(checkValid(newSpot, originalSpot)) {//if it is a valid move
-								if(originalSpot.getText().equals("1e") ||
-									originalSpot.getText().equals("2e")) {
-									newSpot.setIcon(elephantImg);
-									newSpot.setText(playerTurn + "e");
-								}else if(originalSpot.getText().equals("1c") ||
-									originalSpot.getText().equals("2c")) {
-									newSpot.setIcon(camelImg);
-									newSpot.setText(playerTurn + "c");
-								}else if(originalSpot.getText().equals("1h") ||
-									originalSpot.getText().equals("2h")) {
-									newSpot.setIcon(horseImg);
-									newSpot.setText(playerTurn + "h");
-								}else if(originalSpot.getText().equals("1d") ||
-									originalSpot.getText().equals("2d")) {
-									newSpot.setIcon(dogImg);
-									newSpot.setText(playerTurn + "d");
-								}else if(originalSpot.getText().equals("1ca") ||
-									originalSpot.getText().equals("2ca")) {
-									newSpot.setIcon(catImg);
-									newSpot.setText(playerTurn + "ca");
-								}else if(originalSpot.getText().equals("1r") ||
-									originalSpot.getText().equals("2r")) {
-									newSpot.setIcon(rabbitImg);
-									newSpot.setText(playerTurn + "r");
-								}
-								originalSpot.setIcon(null);
-								originalSpot.setText("");
-								movesMade++;
-								if(movesMade < 4) {
-									int answer = JOptionPane.showConfirmDialog(panel, "Would you like to make another move?");
-									if(answer == JOptionPane.NO_OPTION) {
-										JOptionPane.showMessageDialog(panel, "Next player's turn.");
-										if(turn == PLAYER_ONE) {
-											turn = PLAYER_TWO;
-										}else {
-											turn = PLAYER_ONE;
-										}
-									}
-								}else {
-									JOptionPane.showMessageDialog(panel, "Next player's turn.");
-									movesMade = 0;
-									if(turn == PLAYER_ONE) {
-										turn = PLAYER_TWO;
-									}else {
-										turn = PLAYER_ONE;
-									}
-								}
-								
-							}
-							clicks = 0;
-							makingMove = false;
-						}
-					}
-				}
-			}
-		}
-		
-	}
-	
-	
-	
-	public boolean checkValid(JButton placement, JButton oldPlacement) {
-		if (setUpStatus) {//to check if a move is a valid set up move
-			if(turn == PLAYER_ONE) { //valid player one set up
-				if(originalY == 6 ||
-				   originalY == 7) {
-					if(oldPlacement.getIcon() == null) {
-						return true;
-					}
-				}
-			}else {//valid player two set up
-				if(originalY == 0 ||
-					originalY == 1) {
-					if(oldPlacement.getIcon() == null) {
-						return true;
-					}
-				}
-			}
-			
-		}else {//to check if a move during the game is valid
-			if(turn == PLAYER_ONE) {
-				if(makingMove == false) {
-					//check freeze
-					if(oldPlacement.getText().equals("1e") ||
-					oldPlacement.getText().equals("1c") ||
-					oldPlacement.getText().equals("1h") ||
-					oldPlacement.getText().equals("1d") ||
-					oldPlacement.getText().equals("1ca")||
-					oldPlacement.getText().equals("1r")) {//if the button pressed has a friendly piece on it
-						return true;
-					}
-				}else {//you are making a move
-					if(placement.getIcon() == null) {
-						if(oldPlacement.getText().equals("1e") ||
-						    oldPlacement.getText().equals("1c") ||
-						    oldPlacement.getText().equals("1h") ||
-						    oldPlacement.getText().equals("1d") ||
-						    oldPlacement.getText().equals("1ca")) {//for all pieces that can move backwards
-							if(originalY + 1 == newY ||
-								originalY - 1 == newY) {//if move was up or down one
-								if(originalX + 1 != newX &&
-									originalX - 1 != newX) {//no diagonals
-									return true;
-								}else {
-									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
-								}
-							}else if(originalX + 1 == newX ||
-									originalX - 1 == newX) {//if the move was to the left or right one
-								if(originalY + 1 != newY &&
-									originalY - 1 != newY) {//no diagonals
-									return true;
-								}else {
-									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
-								}
-							}else {
-								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, up, or down.");
-							}
-							
-						}else if(oldPlacement.getText().equals("1r")){//rabbit can't move back
-							if(originalY - 1 == newY) {//if move was up one
-								if(originalX + 1 != newX &&
-									originalX - 1 != newX) {//no diagonals
-									return true;
-								}
-							}else if(originalX + 1 == newX ||
-									originalX - 1 == newX) {//if the move was to the left or right one
-								if(originalY - 1 != newY) {//no diagonals
-									return true;
-								}else {
-									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
-								}
-							}else {
-							
-								JOptionPane.showMessageDialog(panel, "Rabbit can only move one jump left, right, or up.");
-							}
-						}else {
-							JOptionPane.showMessageDialog(panel, "It's not your turn.");
-						}
-					}else {
-						JOptionPane.showMessageDialog(panel, "You can't push that piece.");
-					}
-				}
-			}else if(turn == PLAYER_TWO) {
-				if(makingMove == false) {
-					if(oldPlacement.getText().equals("2e") ||
-					oldPlacement.getText().equals("2c") ||
-					oldPlacement.getText().equals("2h") ||
-					oldPlacement.getText().equals("2d") ||
-					oldPlacement.getText().equals("2ca")||
-					oldPlacement.getText().equals("2r")) {//if the button pressed has a friendly piece on it
-						return true;
-					}
-				}else {//you are making a move
-					if(placement.getIcon() == null) {
-						if(oldPlacement.getText().equals("2e") ||
-							oldPlacement.getText().equals("2c") ||
-							oldPlacement.getText().equals("2h") ||
-							oldPlacement.getText().equals("2d") ||
-							oldPlacement.getText().equals("2ca")) {//for all pieces that can move backwards
-							if(originalY + 1 == newY ||
-								originalY - 1 == newY) {//if move was up or down one
-								if(originalX + 1 != newX &&
-									originalX - 1 != newX) {//no diagonals
-									return true;
-								}else {
-									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
-								}
-							}else if(originalX + 1 == newX ||
-									originalX - 1 == newX) {//if the move was to the left or right one
-								if(originalY + 1 != newY &&
-									originalY - 1 != newY) {//no diagonals
-									return true;
-								}else {
-									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
-								}
-							}else {
-								JOptionPane.showMessageDialog(panel, "You can only move one jump left, right, up, or down.");
-							}
-							
-						}else if(oldPlacement.getText().equals("2r")){//rabbit can't move back
-							if(originalY + 1 == newY) {//if move was up one
-								if(originalX + 1 != newX &&
-									originalX - 1 != newX) {//no diagonal
-									return true;
-								}else {
-									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
-								}
-							}else if(originalX + 1 == newX ||
-									originalX - 1 == newX) {//if the move was to the left right one
-								if(originalY + 1 != newY) {//no diagonal
-									return true;
-								}else {
-									JOptionPane.showMessageDialog(panel, "You can't move diagonally.");
-								}
-							}else {
-								JOptionPane.showMessageDialog(panel, "Rabbits can only move one jump left, right, or up.");
-							}
-						}else {
-							JOptionPane.showMessageDialog(panel, "It's not your turn.");
-						}
-					}else {
-						JOptionPane.showMessageDialog(panel, "You can't push that piece.");
-					}
-				}
-			}
-				
-		}
-		return false;
-	}
-	
-	
-	
-	/*
-	 * This method sets up the board pieces by allowing players to only click
-	 * on the first two rows of their side to place their pieces one by one.
-	 */
-	public void setUp() {
-		setUpStatus = true;
-		//set players pieces up
-		JOptionPane.showMessageDialog(panel, "Player, place your elephant.");
-	}
+        public int x;
+        public int y;
+        
+        //x setter 
+        public void setX(int newx) {
+        	x = newx;
+        }
+        //y setter
+        public void setY(int newy) {
+        	y = newy;
+        }
 
+        public BoardButton(int x, int y) {
+            super();
+
+            this.x = x;
+            this.y = y;
+        }
+
+        public void setPlayer(Player player) {
+            this.player = player;
+
+            this.setBackground(player == Player.GOLD ? new Color(255, 215, 0) : new Color(192, 192, 192));
+            this.setOpaque(true);
+        }
+
+        /**
+         * Resets the spot
+         */
+        public void reset() {
+            this.player = Player.NONE;
+            this.piece = Piece.NONE;
+            this.setBackground(null);
+            this.setOpaque(false);
+            this.setIcon(null);
+        }
+
+        /**
+         * Copies the information from another spot
+         * @param other
+         */
+        public void copy(BoardButton other) {
+            this.player = other.player;
+            this.piece = other.piece;
+            this.setBackground(other.getBackground());
+            this.setOpaque(true);
+            this.setIcon(other.getIcon());
+        }
+    }
+
+    //Image variables for pieces:
+    ImageIcon elephantImg = new ImageIcon("Images/elephant.png");
+    ImageIcon camelImg = new ImageIcon("Images/camel.png");
+    ImageIcon horseImg = new ImageIcon("Images/horse.png");
+    ImageIcon dogImg = new ImageIcon("Images/dog.png");
+    ImageIcon catImg = new ImageIcon("Images/cat.png");
+    ImageIcon rabbitImg = new ImageIcon("Images/rabbit.png");
+
+    Container north = new Container();
+    JLabel gameStateLabel = new JLabel();
+    JLabel movesRemainingLabel = new JLabel();
+    JLabel empty1 = new JLabel();
+    JLabel empty2 = new JLabel();
+    JLabel empty3 = new JLabel();
+    JLabel empty4 = new JLabel();
+
+    JFrame panel = new JFrame("Arimaa");
+    Container center = new Container();
+    BoardButton[][] board = new BoardButton[8][8];
+
+    GameState state;
+
+    int clicks = 0;
+    int moveCount = 0;
+    BoardButton from;
+    BoardButton to;
+    BoardButton adjacents;
+
+    public ArimaaMain() {
+        this.createInterface();
+
+        this.setGameState(GameState.GOLD_SETUP);
+    }
+
+    public static void main(String[] args) {
+        new ArimaaMain();
+    }
+
+    /**
+     * Constructs GUI
+     */
+    private void createInterface() {
+        /*
+         * I used code from stackoverflow.com
+         * URL: https://stackoverflow.com/questions/6714045/how-to-resize-jlabel-imageicon
+         * I used this code to resize my Jlabel images to fit better in the JFrame.
+         */
+        //Image resizing elephant
+        Image eImage = elephantImg.getImage();
+        Image newEImage = eImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        elephantImg = new ImageIcon(newEImage);
+
+        //Image resizing camel
+        Image cImage = camelImg.getImage();
+        Image newCImage = cImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        camelImg = new ImageIcon(newCImage);
+
+        //Image resizing horse
+        Image hImage = horseImg.getImage();
+        Image newHImage = hImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        horseImg = new ImageIcon(newHImage);
+
+        //Image resizing dog
+        Image dImage = dogImg.getImage();
+        Image newDImage = dImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        dogImg = new ImageIcon(newDImage);
+
+        //Image resizing cat
+        Image catImage = catImg.getImage();
+        Image newCatImage = catImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        catImg = new ImageIcon(newCatImage);
+
+        //Image resizing rabbit
+        Image rImage = rabbitImg.getImage();
+        Image newRImage = rImage.getScaledInstance(50, 50, Image.SCALE_SMOOTH);
+        rabbitImg = new ImageIcon(newRImage);
+
+
+        //Frame layout
+        panel.setSize(800, 800);
+        panel.setLayout(new BorderLayout());
+
+        gameStateLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+        movesRemainingLabel.setFont(new Font("Serif", Font.PLAIN, 20));
+
+        // North layout
+        north.setLayout(new GridLayout(3, 2));
+        north.add(empty1);
+        north.add(empty2);
+        north.add(gameStateLabel);
+        north.add(movesRemainingLabel);
+        north.add(empty3);
+        north.add(empty4);
+
+
+        panel.add(north, BorderLayout.NORTH);
+
+        //center layout
+        center.setLayout(new GridLayout(8, 8));
+        for (int y = 0; y < board.length; y++) {
+            for (int x = 0; x < board.length; x++) {
+                board[y][x] = new BoardButton(x, y);
+
+                if (y == 2 || y == 5) {
+                    if (x == 2 || x == 5) {
+                        board[y][x].setBackground(Color.RED);
+                        board[y][x].setOpaque(true);
+                    }
+                }
+
+                center.add(board[y][x]);
+                board[y][x].addActionListener(this);
+            }
+        }
+
+        panel.add(center, BorderLayout.CENTER);
+
+        panel.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        panel.setVisible(true);
+    }
+
+    /**
+     * Runs through the setup sequence for a player
+     * @param player
+     * @param selectedSpot
+     */
+    public void performSetup(Player player, BoardButton selectedSpot) {
+
+        boolean didSelectInValidRows = (player == Player.GOLD && (selectedSpot.y == 6 || selectedSpot.y == 7)) || (player == Player.SILVER && (selectedSpot.y == 0 || selectedSpot.y == 1));
+        String playerName = player == Player.GOLD ? "Gold" : "Silver";
+
+        if (didSelectInValidRows && selectedSpot.piece == Piece.NONE) { // Selected spot is in the first rows and contains no piece
+            if (clicks == 0) { //change background of button to an elephant
+                selectedSpot.setIcon(elephantImg);
+                selectedSpot.piece = Piece.ELEPHANT;
+                selectedSpot.setPlayer(player);
+
+                JOptionPane.showMessageDialog(panel, playerName + ", place your camel.");
+                clicks++;
+            }
+            else if (clicks == 1) { // change button to camel
+                selectedSpot.setIcon(camelImg);
+                selectedSpot.piece = Piece.CAMEL;
+                selectedSpot.setPlayer(player);
+
+                JOptionPane.showMessageDialog(panel, playerName + ", place your horses.");
+                clicks++;
+            }
+            else if (clicks == 2 || clicks == 3) { //change button to horse for two clicks
+                selectedSpot.setIcon(horseImg);
+                selectedSpot.piece = Piece.HORSE;
+                selectedSpot.setPlayer(player);
+
+                if (clicks == 3) JOptionPane.showMessageDialog(panel, playerName + ", place your dogs.");
+                clicks++;
+            }
+            else if (clicks == 4 || clicks == 5) {//change button to dog for two clicks
+                selectedSpot.setIcon(dogImg);
+                selectedSpot.piece = Piece.DOG;
+                selectedSpot.setPlayer(player);
+
+                if (clicks == 5) JOptionPane.showMessageDialog(panel, playerName + ", place your cats.");
+                clicks++;
+            }
+            else if (clicks == 6 || clicks == 7) { //change button to cat for two clicks
+                selectedSpot.setIcon(catImg);
+                selectedSpot.piece = Piece.CAT;
+                selectedSpot.setPlayer(player);
+
+                if (clicks == 7) JOptionPane.showMessageDialog(panel, playerName + ", place your rabbits.");
+                clicks++;
+            }
+            else if (8 <= clicks && clicks <= 15) { //change button to rabbit for seven clicks
+                selectedSpot.setIcon(rabbitImg);
+                selectedSpot.piece = Piece.RABBIT;
+                selectedSpot.setPlayer(player);
+
+                if (clicks == 15) { // if that was the last placement reset clicks for next player or start of game
+                    this.setGameState(state == GameState.GOLD_SETUP ? GameState.SILVER_SETUP : GameState.GOLD_TURN);
+                    clicks = 0;
+                }
+                else {
+                    clicks++;
+                }
+            }
+            else {
+                JOptionPane.showMessageDialog(panel, "Not a valid spot!");
+            }
+        }
+    }
+
+    /**
+     * First checks if the move being made is a Rabbit trying to move backwards, and if not, checks if the move is orthogonal. If both are true, the move is valid.
+     * @param player
+     * @param from
+     * @param to
+     * @return
+     */
+    private boolean isValidMove(Player player, BoardButton from, BoardButton to) {
+    	
+    	setAdjacent(0, 1); //checks the piece above or below
+    	checkFreeze();
+    	
+    	setAdjacent(0, -1);//checks the piece above or below
+    	checkFreeze();
+    	
+    	setAdjacent(1, 0); //checks the piece to the right
+    	checkFreeze();
+    	
+    	setAdjacent(-1, 0); //checks the piece to the left
+    	checkFreeze();
+    	
+        // Checks piece is rabbit moving backwards
+        if ((player == Player.GOLD && from.piece == Piece.RABBIT && from.y - to.y == -1) || (player == Player.SILVER && from.piece == Piece.RABBIT && from.y - to.y == 1)) {
+            return false;
+        }
+
+        // Checks if move is orthogonal
+        if ((Math.abs(to.x - from.x) + Math.abs(to.y - from.y)) == 1) {
+            // is orthogonal
+
+            // Verifies that board spot isn't taken
+            if (to.piece == Piece.NONE) {
+                // spot isn't taken
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public void setAdjacent(int xMove, int yMove) {
+    	adjacents.setX(from.x + xMove);
+    	adjacents.setY(from.y + yMove);
+    }
+    
+    /**
+     * To check if the piece selected (from piece) is frozen.
+     * Is frozen if there is a stronger enemy piece adjacent.
+     * And if there are no friend pieces adjacent.
+     * Returns true is that piece is frozen.
+     */
+    public boolean checkFreeze(){
+    	
+    	
+    	if(!from.getBackground().equals(adjacents.getBackground())) { //if they are not the same team
+    		if(from.piece.strength < adjacents.piece.strength) { //if the adjacent piece is stronger
+    			if(checkForFriends() == false) {//if there are no friends adjacent
+    				return true;
+    			}
+    		}
+    	}
+    	
+    	return false;
+    }
+    
+    /*
+     * To check if the piece selected (from piece) has a friendly piece adjacent
+     * Check each adjacent spot and if there is a piece with the same background return true.
+     */
+    public boolean checkForFriends() {
+    	adjacents.setX(from.x);
+    	adjacents.setY(from.y + 1); //check the piece above or below
+    	
+    	if(from.getBackground().equals(adjacents.getBackground())) {//if the adjacent piece is on your team
+    		return true;
+    	}
+    	
+    	adjacents.setX(from.x);
+    	adjacents.setY(from.y - 1);//check the piece above or below
+    	
+    	
+    	
+    	return false;
+    }
+
+    /**
+     * For a valid move, the old spot is reset and the new spot takes the information of the old spot
+     * The move count is incremented here
+     */
+    private void executeValidMove() {
+        to.copy(from);
+        from.reset();
+        from = null;
+
+        this.incrementMoveCount();
+    }
+
+    /**
+     * If a players moves run out or they decide to skip moves, the move count is reset and the game state is set to the other players turn
+     */
+    private void handleTurnSwap() {
+        if (moveCount == 4 || JOptionPane.showConfirmDialog(panel, "Move again?", "WARNING", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+            this.setGameState(state == GameState.GOLD_TURN ? GameState.SILVER_TURN : GameState.GOLD_TURN);
+            this.resetMoveCount();
+        }
+    }
+
+    /**
+     * Performs a move for a player and to the selected spot
+     * @param player
+     * @param selectedSpot
+     */
+    private void performMove(Player player, BoardButton selectedSpot) {
+
+        if (from == null && selectedSpot.piece != Piece.NONE) { // directs the player into selecting the from spot
+            if (selectedSpot.player == player) {
+                from = selectedSpot;
+            }
+        }
+        else if (from != null) { // means the player is selecting the to spot
+
+            if (selectedSpot.piece == Piece.NONE && isValidMove(player, from, selectedSpot)) {
+                to = selectedSpot;
+
+                this.executeValidMove();
+                this.handleTurnSwap();
+            }
+        }
+    }
+
+    /**
+     * Checks to see if the spot is a trap
+     * @param spot
+     * @return
+     */
+    private boolean isTrap(BoardButton spot) {
+        return (spot.x == 2 || spot.x == 5) && (spot.x == 2 || spot.y == 5);
+    }
+
+    /**
+     * Sets the game state to the new state and updates the game state label with a message depending on the state
+     * @param newState
+     */
+    private void setGameState(GameState newState) {
+        this.state = newState;
+
+        switch (state) {
+            case GOLD_SETUP -> this.gameStateLabel.setText("Gold is setting up the board!");
+            case SILVER_SETUP -> this.gameStateLabel.setText("Silver is setting up the board!");
+            case GOLD_TURN -> this.gameStateLabel.setText("It's Gold's turn!");
+            case SILVER_TURN -> this.gameStateLabel.setText("It's Silver's turn!");
+            case GOLD_WIN ->  this.gameStateLabel.setText("Gold has won!!!");
+            case SILVER_WIN ->  this.gameStateLabel.setText("Silver has won!!!");
+        }
+    }
+
+    /**
+     * Increments move count by one and updates moves remaining label
+     */
+    private void incrementMoveCount() {
+        moveCount++;
+        this.movesRemainingLabel.setText("Moves remaining: " + (4 - moveCount));
+    }
+
+    /**
+     * Resets the move counter and updates moves remaining label
+     */
+    private void resetMoveCount() {
+        moveCount = 0;
+        this.movesRemainingLabel.setText("Moves remaining: 4");
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() instanceof BoardButton) {
+            BoardButton selectedSpot = (BoardButton) e.getSource();
+
+            if (state == GameState.GOLD_SETUP) {
+                performSetup(Player.GOLD, selectedSpot);
+            }
+            else if (state == GameState.SILVER_SETUP) {
+                performSetup(Player.SILVER, selectedSpot);
+            }
+            else if (state == GameState.GOLD_TURN) {
+                performMove(Player.GOLD, selectedSpot);
+            }
+            else if (state == GameState.SILVER_TURN) {
+                performMove(Player.SILVER, selectedSpot);
+            }
+        }
+    }
 }
+
