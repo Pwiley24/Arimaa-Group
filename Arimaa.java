@@ -1,4 +1,4 @@
- package arimaaProject;
+package arimaaProject;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -298,63 +298,57 @@ public class ArimaaMain implements ActionListener {
      * @param spot
      */
     public boolean isInFreezablePosition(BoardButton spot) {
-        boolean res = false;
-
-        if (spot.x - 1 >= 0) { // left exists
-            System.out.println("left");
-            System.out.println(spot.x - 1 + " " + spot.y);
-
-            if (board[spot.x - 1][spot.y].player == spot.player) { // if friendly, isn't frozen
+        
+    	boolean res = false;
+    	
+    	if(spot.y - 1 >= 0) { //left exists
+    		if (board[spot.y - 1][spot.x].player == spot.player) { // if friendly, isn't frozen. Checks to the left
                 return false;
             }
-            else if (board[spot.x - 1][spot.y].player != Player.NONE && board[spot.x - 1][spot.y].piece.strength > spot.piece.strength) {
-                res = true;
+            else if (board[spot.y - 1][spot.x].piece != Piece.NONE && board[spot.x - 1][spot.y].piece.strength > spot.piece.strength) {             
+            	res = true;
             }
-        }
-
-        if (spot.x + 1 <= 7) { // right exists
-            System.out.println("right");
-            System.out.println(spot.x + 1 + " " + spot.y);
-
-            if (board[spot.x + 1][spot.y].player == spot.player) { // if friendly, isn't frozen
+    	}
+    	
+    	if (spot.y + 1 <= 7) { // right exists
+            if (board[spot.x + 1][spot.y].player == spot.player) { // if friendly, isn't frozen. Checks to the right
                 return false;
             }
-            else if (board[spot.x + 1][spot.y].player != Player.NONE && board[spot.x + 1][spot.y].piece.strength > spot.piece.strength) {
-                res = true;
+            else if (board[spot.y + 1][spot.x].piece != Piece.NONE && board[spot.x + 1][spot.y].piece.strength > spot.piece.strength) {
+                
+            	res = true;
             }
         }
-
-        if (spot.y - 1 >= 0) { // top exists
-            System.out.println("top");
-            System.out.println(spot.x + " " + (spot.y - 1));
-
-            if (board[spot.x][spot.y - 1].player == spot.player) { // if friendly, isn't frozen
-                return false;
-            }
-            else if (board[spot.x][spot.y - 1].player != Player.NONE && board[spot.x][spot.y - 1].piece.strength > spot.piece.strength) {
-                res = true;
-            }
-        }
-
-        if (spot.y + 1 <= 7) { // bottom exists
-            System.out.println("bottom");
-            System.out.println(spot.x + " " + (spot.y + 1));
-
-
-            if (board[spot.x][spot.y + 1].player == spot.player) { // if friendly, isn't frozen
-                return false;
-            }
-            else if (board[spot.x][spot.y + 1].player != Player.NONE && board[spot.x][spot.y + 1].piece.strength > spot.piece.strength) {
-                res = true;
-            }
-        }
-
-        return res;
+    	
+    	 if (spot.x - 1 >= 0) { // top exists
+             if (board[spot.y][spot.x - 1].player == spot.player) { // if friendly, isn't frozen. Checks north
+                 return false;
+             }
+             else if (board[spot.y][spot.x - 1].piece != Piece.NONE && board[spot.x][spot.y - 1].piece.strength > spot.piece.strength) {
+            	 res = true;
+             }
+         }
+    	
+    	 if (spot.x + 1 <= 7) { // bottom exists
+             if (board[spot.y][spot.x + 1].player == spot.player) { // if friendly, isn't frozen. Checks south
+                 return false;
+             }
+             else if (board[spot.y][spot.x + 1].piece != Piece.NONE && board[spot.x][spot.y + 1].piece.strength > spot.piece.strength) {   
+            	 res = true;
+             }
+         }
+    	 return res;
     }
+    	
+
+    
 
     private void handleFreezing(BoardButton spot) {
         if (isInFreezablePosition(spot)) {
             spot.piece.isFrozen = true;
+        }
+        if(!isInFreezablePosition(spot)) {
+        	spot.piece.isFrozen = false;
         }
     }
     
@@ -395,7 +389,7 @@ public class ArimaaMain implements ActionListener {
         }
 
         if (from.piece.isFrozen) {
-            System.out.println("is frozen");
+            //System.out.println("is frozen");
 
             return false;
         }
@@ -443,12 +437,13 @@ public class ArimaaMain implements ActionListener {
      * @param selectedSpot
      */
     private void performMove(Player player, BoardButton selectedSpot) {
-
+    	
         if (selectedSpot.piece != Piece.NONE) { // directs the player into selecting the from spot
             if (selectedSpot.player == player) {
                 from = selectedSpot;
+               // System.out.println("the piece: " + from.piece);
                 
-                //this.handleFreezing(from);
+                handleFreezing(from);
             }
         }
         else if (from != null) { // means the player is selecting the to spot
@@ -456,14 +451,14 @@ public class ArimaaMain implements ActionListener {
             if (selectedSpot.piece == Piece.NONE && isValidMove(player, from, selectedSpot)) {
                 to = selectedSpot;
 
-                System.out.println("from: " + from.x + " " + from.y);
-                System.out.println("to: " + to.x + " " + to.y);
+               // System.out.println("from: " + from.x + " " + from.y);
+               // System.out.println("to: " + to.x + " " + to.y);
 
                 handleWins();
-                //this.handleFreezing(to);
+                handleFreezing(to);
                 this.executeValidMove();
                 this.handleTurnSwap();
-                trap(selectedSpot);
+                trap();
                 recolorTrap();
             }else {
             	JOptionPane.showMessageDialog(panel, "Not a valid move.");
@@ -532,12 +527,35 @@ public class ArimaaMain implements ActionListener {
      * @param spot
      * @return
      */
-    private void trap(BoardButton spot) {
-        if((spot.x == 2 && spot.y == 2) || (spot.x == 2 && spot.y == 5) || (spot.x == 5 && spot.y == 2) || (spot.x == 5 && spot.y == 5)) { //the piece is on a trap
-        	if(!checkForFriends(spot)) { //no friends adjacent to piece on trap
-        		spot.trapPiece();
-        	}
+    private void trap() {
+        if(board[2][2].piece != Piece.NONE) {//piece on the top left trap
+        	trap = board[2][2];
+        	  if(!checkForFriends(trap)) { //no friends adjacent to piece on trap
+          		trap.trapPiece();
+          	}
         }
+        if(board[2][5].piece != Piece.NONE) {//piece on the top right trap
+        	trap = board[2][5];
+        	  if(!checkForFriends(trap)) { //no friends adjacent to piece on trap
+          		trap.trapPiece();
+          	}
+        }
+        if(board[5][2].piece != Piece.NONE) {//piece on the bottom left trap
+        	trap = board[5][2];
+        	  if(!checkForFriends(trap)) { //no friends adjacent to piece on trap
+          		trap.trapPiece();
+          	}
+        }
+        if(board[5][5].piece != Piece.NONE) {//piece on the bottom right trap
+        	trap = board[5][5];
+        	  if(!checkForFriends(trap)) { //no friends adjacent to piece on trap
+          		trap.trapPiece();
+          	}
+        }
+       
+
+        
+        
     }
 
     
