@@ -1,61 +1,5 @@
     
-        //also need to take into account the pushing and pulling pieces
-        if(isTrap(to)) {//if the to button is in a trap
-    		if(!checkForFriends(to)) {
-    			to.reset();
-    		}
-    	}
-        
-
-        return false;
-    }
-    
-    
-    
- 
-    
-    
-   
-    
-    /*
-     * To check if the piece selected has a friendly piece adjacent
-     * Check each adjacent spot and if there is a piece with the same background return true.
-     */
-    public boolean checkForFriends(BoardButton spot) {
-    	boolean res = false;
-    	if(spot.x + 1 <= 7) { //if the spot is not outside of the board
-    		if(spot.player == board[spot.y][spot.x+1].player) {//if they are on the same team
-    			res = true;
-    		}
-    	}
-    	if(spot.x - 1 >= 0) {//if the spot is not outside the board
-    		if(spot.player == board[spot.y][spot.x-1].player) {
-    			res = true;
-    		}
-    	}
-    	if(spot.y + 1 <= 7) {//if spot is not outside board
-    		if(spot.player == board[spot.y + 1][spot.x].player) {
-    			res = true;
-    		}
-    	}
-    	if(spot.y - 1 >= 0) {//if spot is not outside board
-    		if(spot.player == board[spot.y - 1][spot.x].player) {
-    			res = true;
-    		}
-    	}
-
-    	return res;
-    }
-
-package arimaaProject;
-
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
-import javax.swing.*;
-
-public class ArimaaMain implements ActionListener {
+       public class ArimaaMain implements ActionListener {
 
     enum Player {
         GOLD, SILVER, NONE;
@@ -65,7 +9,7 @@ public class ArimaaMain implements ActionListener {
         RABBIT(1), CAT(2), DOG(3), HORSE(4), CAMEL(5), ELEPHANT(6), NONE(0);
 
         public final int strength;
-        public final boolean isFrozen = false;
+        public boolean isFrozen = false;
 
         Piece(int strength) {
             this.strength = strength;
@@ -83,15 +27,6 @@ public class ArimaaMain implements ActionListener {
 
         public int x;
         public int y;
-        
-        //x setter 
-        public void setX(int newx) {
-        	x = newx;
-        }
-        //y setter
-        public void setY(int newy) {
-        	y = newy;
-        }
 
         public BoardButton(int x, int y) {
             super();
@@ -125,6 +60,7 @@ public class ArimaaMain implements ActionListener {
         public void copy(BoardButton other) {
             this.player = other.player;
             this.piece = other.piece;
+            this.piece.isFrozen = other.piece.isFrozen;
             this.setBackground(other.getBackground());
             this.setOpaque(true);
             this.setIcon(other.getIcon());
@@ -157,7 +93,6 @@ public class ArimaaMain implements ActionListener {
     int moveCount = 0;
     BoardButton from;
     BoardButton to;
-    BoardButton adjacents;
 
     public ArimaaMain() {
         this.createInterface();
@@ -268,7 +203,7 @@ public class ArimaaMain implements ActionListener {
                 selectedSpot.piece = Piece.ELEPHANT;
                 selectedSpot.setPlayer(player);
 
-                JOptionPane.showMessageDialog(panel, playerName + ", place your camel.");
+                //JOptionPane.showMessageDialog(panel, playerName + ", place your camel.");
                 clicks++;
             }
             else if (clicks == 1) { // change button to camel
@@ -276,7 +211,7 @@ public class ArimaaMain implements ActionListener {
                 selectedSpot.piece = Piece.CAMEL;
                 selectedSpot.setPlayer(player);
 
-                JOptionPane.showMessageDialog(panel, playerName + ", place your horses.");
+                //JOptionPane.showMessageDialog(panel, playerName + ", place your horses.");
                 clicks++;
             }
             else if (clicks == 2 || clicks == 3) { //change button to horse for two clicks
@@ -284,7 +219,7 @@ public class ArimaaMain implements ActionListener {
                 selectedSpot.piece = Piece.HORSE;
                 selectedSpot.setPlayer(player);
 
-                if (clicks == 3) JOptionPane.showMessageDialog(panel, playerName + ", place your dogs.");
+                //if (clicks == 3) JOptionPane.showMessageDialog(panel, playerName + ", place your dogs.");
                 clicks++;
             }
             else if (clicks == 4 || clicks == 5) {//change button to dog for two clicks
@@ -292,7 +227,7 @@ public class ArimaaMain implements ActionListener {
                 selectedSpot.piece = Piece.DOG;
                 selectedSpot.setPlayer(player);
 
-                if (clicks == 5) JOptionPane.showMessageDialog(panel, playerName + ", place your cats.");
+                //if (clicks == 5) JOptionPane.showMessageDialog(panel, playerName + ", place your cats.");
                 clicks++;
             }
             else if (clicks == 6 || clicks == 7) { //change button to cat for two clicks
@@ -300,7 +235,7 @@ public class ArimaaMain implements ActionListener {
                 selectedSpot.piece = Piece.CAT;
                 selectedSpot.setPlayer(player);
 
-                if (clicks == 7) JOptionPane.showMessageDialog(panel, playerName + ", place your rabbits.");
+                //if (clicks == 7) JOptionPane.showMessageDialog(panel, playerName + ", place your rabbits.");
                 clicks++;
             }
             else if (8 <= clicks && clicks <= 15) { //change button to rabbit for seven clicks
@@ -323,6 +258,74 @@ public class ArimaaMain implements ActionListener {
     }
 
     /**
+     * left: x - 1, y
+     * right: x + 1, y
+     * top: x, y - 1
+     * down: x, y + 1
+     * @param spot
+     */
+    public boolean isInFreezablePosition(BoardButton spot) {
+        boolean res = false;
+
+        if (spot.x - 1 >= 0) { // left exists
+            System.out.println("left");
+            System.out.println(spot.x - 1 + " " + spot.y);
+
+            if (board[spot.x - 1][spot.y].player == spot.player) { // if friendly, isn't frozen
+                return false;
+            }
+            else if (board[spot.x - 1][spot.y].player != Player.NONE && board[spot.x - 1][spot.y].piece.strength > spot.piece.strength) {
+                res = true;
+            }
+        }
+
+        if (spot.x + 1 <= 7) { // right exists
+            System.out.println("right");
+            System.out.println(spot.x + 1 + " " + spot.y);
+
+            if (board[spot.x + 1][spot.y].player == spot.player) { // if friendly, isn't frozen
+                return false;
+            }
+            else if (board[spot.x + 1][spot.y].player != Player.NONE && board[spot.x + 1][spot.y].piece.strength > spot.piece.strength) {
+                res = true;
+            }
+        }
+
+        if (spot.y - 1 >= 0) { // top exists
+            System.out.println("top");
+            System.out.println(spot.x + " " + (spot.y - 1));
+
+            if (board[spot.x][spot.y - 1].player == spot.player) { // if friendly, isn't frozen
+                return false;
+            }
+            else if (board[spot.x][spot.y - 1].player != Player.NONE && board[spot.x][spot.y - 1].piece.strength > spot.piece.strength) {
+                res = true;
+            }
+        }
+
+        if (spot.y + 1 <= 7) { // bottom exists
+            System.out.println("bottom");
+            System.out.println(spot.x + " " + (spot.y + 1));
+
+
+            if (board[spot.x][spot.y + 1].player == spot.player) { // if friendly, isn't frozen
+                return false;
+            }
+            else if (board[spot.x][spot.y + 1].player != Player.NONE && board[spot.x][spot.y + 1].piece.strength > spot.piece.strength) {
+                res = true;
+            }
+        }
+
+        return res;
+    }
+
+    private void handleFreezing(BoardButton spot) {
+        if (isInFreezablePosition(spot)) {
+            spot.piece.isFrozen = true;
+        }
+    }
+
+    /**
      * First checks if the move being made is a Rabbit trying to move backwards, and if not, checks if the move is orthogonal. If both are true, the move is valid.
      * @param player
      * @param from
@@ -330,21 +333,15 @@ public class ArimaaMain implements ActionListener {
      * @return
      */
     private boolean isValidMove(Player player, BoardButton from, BoardButton to) {
-    	
-    	setAdjacent(0, 1); //checks the piece above or below
-    	checkFreeze();
-    	
-    	setAdjacent(0, -1);//checks the piece above or below
-    	checkFreeze();
-    	
-    	setAdjacent(1, 0); //checks the piece to the right
-    	checkFreeze();
-    	
-    	setAdjacent(-1, 0); //checks the piece to the left
-    	checkFreeze();
-    	
+
         // Checks piece is rabbit moving backwards
         if ((player == Player.GOLD && from.piece == Piece.RABBIT && from.y - to.y == -1) || (player == Player.SILVER && from.piece == Piece.RABBIT && from.y - to.y == 1)) {
+            return false;
+        }
+
+        if (from.piece.isFrozen) {
+            System.out.println("is frozen");
+
             return false;
         }
 
@@ -355,56 +352,12 @@ public class ArimaaMain implements ActionListener {
             // Verifies that board spot isn't taken
             if (to.piece == Piece.NONE) {
                 // spot isn't taken
+
                 return true;
             }
         }
 
         return false;
-    }
-    
-    public void setAdjacent(int xMove, int yMove) {
-    	adjacents.setX(from.x + xMove);
-    	adjacents.setY(from.y + yMove);
-    }
-    
-    /**
-     * To check if the piece selected (from piece) is frozen.
-     * Is frozen if there is a stronger enemy piece adjacent.
-     * And if there are no friend pieces adjacent.
-     * Returns true is that piece is frozen.
-     */
-    public boolean checkFreeze(){
-    	
-    	
-    	if(!from.getBackground().equals(adjacents.getBackground())) { //if they are not the same team
-    		if(from.piece.strength < adjacents.piece.strength) { //if the adjacent piece is stronger
-    			if(checkForFriends() == false) {//if there are no friends adjacent
-    				return true;
-    			}
-    		}
-    	}
-    	
-    	return false;
-    }
-    
-    /*
-     * To check if the piece selected (from piece) has a friendly piece adjacent
-     * Check each adjacent spot and if there is a piece with the same background return true.
-     */
-    public boolean checkForFriends() {
-    	adjacents.setX(from.x);
-    	adjacents.setY(from.y + 1); //check the piece above or below
-    	
-    	if(from.getBackground().equals(adjacents.getBackground())) {//if the adjacent piece is on your team
-    		return true;
-    	}
-    	
-    	adjacents.setX(from.x);
-    	adjacents.setY(from.y - 1);//check the piece above or below
-    	
-    	
-    	
-    	return false;
     }
 
     /**
@@ -439,6 +392,7 @@ public class ArimaaMain implements ActionListener {
         if (from == null && selectedSpot.piece != Piece.NONE) { // directs the player into selecting the from spot
             if (selectedSpot.player == player) {
                 from = selectedSpot;
+                this.handleFreezing(from);
             }
         }
         else if (from != null) { // means the player is selecting the to spot
@@ -446,6 +400,10 @@ public class ArimaaMain implements ActionListener {
             if (selectedSpot.piece == Piece.NONE && isValidMove(player, from, selectedSpot)) {
                 to = selectedSpot;
 
+                System.out.println("from: " + from.x + " " + from.y);
+                System.out.println("to: " + to.x + " " + to.y);
+
+                this.handleFreezing(to);
                 this.executeValidMove();
                 this.handleTurnSwap();
             }
@@ -462,6 +420,23 @@ public class ArimaaMain implements ActionListener {
     }
 
     /**
+     * Increments move count by one and updates moves remaining label
+     */
+    private void incrementMoveCount() {
+        moveCount++;
+        this.movesRemainingLabel.setText("Moves remaining: " + (4 - moveCount));
+    }
+
+    /**
+     * Resets the move counter and updates moves remaining label
+     */
+    private void resetMoveCount() {
+        moveCount = 0;
+        this.movesRemainingLabel.setText("Moves remaining: 4");
+    }
+
+
+    /**
      * Sets the game state to the new state and updates the game state label with a message depending on the state
      * @param newState
      */
@@ -476,22 +451,6 @@ public class ArimaaMain implements ActionListener {
             case GOLD_WIN ->  this.gameStateLabel.setText("Gold has won!!!");
             case SILVER_WIN ->  this.gameStateLabel.setText("Silver has won!!!");
         }
-    }
-
-    /**
-     * Increments move count by one and updates moves remaining label
-     */
-    private void incrementMoveCount() {
-        moveCount++;
-        this.movesRemainingLabel.setText("Moves remaining: " + (4 - moveCount));
-    }
-
-    /**
-     * Resets the move counter and updates moves remaining label
-     */
-    private void resetMoveCount() {
-        moveCount = 0;
-        this.movesRemainingLabel.setText("Moves remaining: 4");
     }
 
     @Override
