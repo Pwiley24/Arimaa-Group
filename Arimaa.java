@@ -362,29 +362,21 @@ public class ArimaaMain implements ActionListener {
      * Recolors the trap if there are no pieces on it
      */
     public void recolorTrap() {
-    	if(board[2][2].player == null) {
+    	if(board[2][2].piece == Piece.NONE) {
     		board[2][2].setBackground(Color.RED);
-    	}else {
-    		trap = (BoardButton) board[2][2];
-    		trap(trap);
+    		board[2][2].setOpaque(true);
     	}
-    	if(board[2][5].player == null) {
+    	if(board[2][5].piece == Piece.NONE) {
     		board[2][5].setBackground(Color.RED);
-    	}else {
-    		trap = (BoardButton) board[2][5];
-    		trap(trap);
+    		board[2][5].setOpaque(true);
     	}
-    	if(board[5][2].player == null) {
+    	if(board[5][2].piece == Piece.NONE) {
     		board[5][2].setBackground(Color.RED);
-    	}else {
-    		trap = (BoardButton) board[5][2];
-    		trap(trap);
+    		board[5][2].setOpaque(true);
     	}
-    	if(board[5][5].player == null) {
+    	if(board[5][5].piece == Piece.NONE) {
     		board[5][5].setBackground(Color.RED);
-    	}else {
-    		trap = (BoardButton) board[5][5];
-    		trap(trap);
+    		board[5][5].setOpaque(true);
     	}
     }
 
@@ -467,6 +459,7 @@ public class ArimaaMain implements ActionListener {
                 System.out.println("from: " + from.x + " " + from.y);
                 System.out.println("to: " + to.x + " " + to.y);
 
+                handleWins();
                 //this.handleFreezing(to);
                 this.executeValidMove();
                 this.handleTurnSwap();
@@ -476,6 +469,62 @@ public class ArimaaMain implements ActionListener {
             	JOptionPane.showMessageDialog(panel, "Not a valid move.");
             }
         }
+    }
+    
+    
+    /**
+     * Determines if there is a winning setup.
+     * Two ways to win:
+     * If there is an opposing rabbit on the other's side.
+     * If one team's rabbits are all trapped.
+     */
+    public void handleWins() {
+    	int goldRabbits = 0;
+    	int silverRabbits = 0;
+    	
+    	//to determine if there are no more rabbits:
+    	for(int x = 0; x < board.length; x++) {
+    		for(int y = 0; y < board.length; y++) {
+    			if(board[y][x].piece == Piece.RABBIT && board[y][x].player == Player.GOLD) { //golds rabbit detected
+    				goldRabbits++;
+    			}
+    			if(board[y][x].piece == Piece.RABBIT && board[y][x].player == Player.SILVER) { // silver rabbit detected
+    				silverRabbits++;
+    			}
+    		}
+    	}
+    	if(goldRabbits <= 0) {//if there are no gold rabbits on the board, silver wins
+    		setGameState(GameState.SILVER_WIN);
+			disableButtons();
+    	}else if(silverRabbits <= 0) {//if there are no silver rabbits on the board, gold wins
+    		setGameState(GameState.GOLD_WIN);
+    		disableButtons();
+    	}
+    	
+    	//to determine if a rabbit made it to the other side of the board:
+    	for(int x = 0; x < board.length; x++) {
+    		if(board[0][x].piece == Piece.RABBIT && board[0][x].player == Player.GOLD) { //if a gold rabbit made it across, they win
+    			System.out.println("gold  is across");
+    			setGameState(GameState.GOLD_WIN);
+    			disableButtons();
+    		}
+    		if(board[7][x].piece == Piece.RABBIT && board[7][x].player == Player.SILVER) {//if a silver rabbit made it across, they win
+    			System.out.println("silver  is across");
+    			setGameState(GameState.SILVER_WIN);
+    			disableButtons();
+    		}
+    	}
+    }
+    
+    /**
+     * Disables all the buttons after a game is won
+     */
+    private void disableButtons() {
+    	for(int x = 0; x < board.length; x++) {
+    		for(int y = 0; y < board.length; y++) {
+    			board[y][x].setEnabled(false);
+    		}
+    	}
     }
 
     /**
