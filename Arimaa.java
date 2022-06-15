@@ -1,5 +1,21 @@
-    
-       public class ArimaaMain implements ActionListener {
+ package arimaaProject;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Font;
+import java.awt.GridLayout;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+
+public class ArimaaMain implements ActionListener {
 
     enum Player {
         GOLD, SILVER, NONE;
@@ -52,6 +68,22 @@
             this.setOpaque(false);
             this.setIcon(null);
         }
+        
+        
+        /**
+         * Resets the spot
+         */
+        public void trapPiece() {
+            this.player = Player.NONE;
+            this.piece = Piece.NONE;
+            this.setBackground(Color.RED);
+            this.setOpaque(true);
+            this.setIcon(null);
+        }
+        
+        
+        
+        
 
         /**
          * Copies the information from another spot
@@ -93,6 +125,7 @@
     int moveCount = 0;
     BoardButton from;
     BoardButton to;
+    BoardButton trap;
 
     public ArimaaMain() {
         this.createInterface();
@@ -324,6 +357,36 @@
             spot.piece.isFrozen = true;
         }
     }
+    
+    /**
+     * Recolors the trap if there are no pieces on it
+     */
+    public void recolorTrap() {
+    	if(board[2][2].player == null) {
+    		board[2][2].setBackground(Color.RED);
+    	}else {
+    		trap = (BoardButton) board[2][2];
+    		trap(trap);
+    	}
+    	if(board[2][5].player == null) {
+    		board[2][5].setBackground(Color.RED);
+    	}else {
+    		trap = (BoardButton) board[2][5];
+    		trap(trap);
+    	}
+    	if(board[5][2].player == null) {
+    		board[5][2].setBackground(Color.RED);
+    	}else {
+    		trap = (BoardButton) board[5][2];
+    		trap(trap);
+    	}
+    	if(board[5][5].player == null) {
+    		board[5][5].setBackground(Color.RED);
+    	}else {
+    		trap = (BoardButton) board[5][5];
+    		trap(trap);
+    	}
+    }
 
     /**
      * First checks if the move being made is a Rabbit trying to move backwards, and if not, checks if the move is orthogonal. If both are true, the move is valid.
@@ -389,10 +452,11 @@
      */
     private void performMove(Player player, BoardButton selectedSpot) {
 
-        if (from == null && selectedSpot.piece != Piece.NONE) { // directs the player into selecting the from spot
+        if (selectedSpot.piece != Piece.NONE) { // directs the player into selecting the from spot
             if (selectedSpot.player == player) {
                 from = selectedSpot;
-                this.handleFreezing(from);
+                
+                //this.handleFreezing(from);
             }
         }
         else if (from != null) { // means the player is selecting the to spot
@@ -403,9 +467,13 @@
                 System.out.println("from: " + from.x + " " + from.y);
                 System.out.println("to: " + to.x + " " + to.y);
 
-                this.handleFreezing(to);
+                //this.handleFreezing(to);
                 this.executeValidMove();
                 this.handleTurnSwap();
+                trap(selectedSpot);
+                recolorTrap();
+            }else {
+            	JOptionPane.showMessageDialog(panel, "Not a valid move.");
             }
         }
     }
@@ -415,10 +483,45 @@
      * @param spot
      * @return
      */
-    private boolean isTrap(BoardButton spot) {
-        return (spot.x == 2 || spot.x == 5) && (spot.x == 2 || spot.y == 5);
+    private void trap(BoardButton spot) {
+        if((spot.x == 2 && spot.y == 2) || (spot.x == 2 && spot.y == 5) || (spot.x == 5 && spot.y == 2) || (spot.x == 5 && spot.y == 5)) { //the piece is on a trap
+        	if(!checkForFriends(spot)) { //no friends adjacent to piece on trap
+        		spot.trapPiece();
+        	}
+        }
     }
 
+    
+    /*
+     * To check if the piece selected has a friendly piece adjacent
+     * Check each adjacent spot and if there is a piece with the same background return true.
+     */
+    public boolean checkForFriends(BoardButton spot) {
+    	if(spot.x + 1 <= 7) { //if the spot is not outside of the board
+    		if(spot.player == board[spot.y][spot.x+1].player) {//if they are on the same team
+    			return true;
+    		}
+    	}
+    	if(spot.x - 1 >= 0) {//if the spot is not outside the board
+    		if(spot.player == board[spot.y][spot.x-1].player) {
+    			return true;
+    		}
+    	}
+    	if(spot.y + 1 <= 7) {//if spot is not outside board
+    		if(spot.player == board[spot.y + 1][spot.x].player) {
+    			return true;
+    		}
+    	}
+    	if(spot.y - 1 >= 0) {//if spot is not outside board
+    		if(spot.player == board[spot.y - 1][spot.x].player) {
+    			return true;
+    		}
+    	}
+
+    	return false;
+    }
+    
+    
     /**
      * Increments move count by one and updates moves remaining label
      */
@@ -473,4 +576,3 @@
         }
     }
 }
-
