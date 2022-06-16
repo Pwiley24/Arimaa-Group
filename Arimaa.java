@@ -33,7 +33,7 @@ public class ArimaaMain implements ActionListener {
     }
 
     enum GameState {
-        GOLD_SETUP, SILVER_SETUP, GOLD_TURN, SILVER_TURN, GOLD_WIN, SILVER_WIN, SILVER_PUSHING, GOLD_PUSHING;
+        GOLD_SETUP, SILVER_SETUP, GOLD_TURN, SILVER_TURN, GOLD_WIN, SILVER_WIN, SILVER_PUSHING, GOLD_PUSHING, SILVER_PULLING, GOLD_PULLING;
     }
 
     class BoardButton extends JButton {
@@ -127,6 +127,7 @@ public class ArimaaMain implements ActionListener {
     BoardButton to;
     BoardButton trap;
     BoardButton pushed;
+    BoardButton pulled;
 
     public ArimaaMain() {
         this.createInterface();
@@ -416,14 +417,59 @@ public class ArimaaMain implements ActionListener {
      * For a valid move, the old spot is reset and the new spot takes the information of the old spot
      * The move count is incremented here
      */
-    private void executeValidMove() {
+    private void executeValidMove(Player player) {
         to.copy(from);
+        if(canBePulled(from, player)) {
+        	if(player == Player.GOLD) {
+    			state = GameState.GOLD_PULLING;
+    		}
+    		else {
+    			state = GameState.SILVER_PULLING;
+    		}
+        }
         from.reset();
         from = null;
+       
 
         this.incrementMoveCount();
     }
 
+    /**
+     * Determines if an opponents piece can be pulled and highlights possible
+     * pieces to be pulled.
+     * @param spot
+     * @return
+     */
+    public boolean canBePulled(BoardButton spot, Player player) {
+		if(spot.y - 1 >= 0) {// top exists
+			if(board[spot.y - 1][spot.x].piece != Piece.NONE && board[spot.y - 1][spot.x].player != player && board[spot.y - 1][spot.x].piece.strength < spot.piece.strength) {// opponent on adjacent square	
+				board[spot.y - 1][spot.x].setBackground(Color.BLUE);
+				return true;
+			}
+		}
+		if (spot.y + 1 <= 7) { // below exists
+            if (board[spot.y + 1][spot.x].piece != Piece.NONE && board[spot.y + 1][spot.x].player != player && board[spot.y + 1][spot.x].piece.strength < spot.piece.strength) { // opponent on adjacent square
+            	board[spot.y + 1][spot.x].setBackground(Color.BLUE);
+            	return true;
+            }
+            
+        }
+   	 	if (spot.x - 1 >= 0) { // left exists
+            if (board[spot.x][spot.x - 1].piece != Piece.NONE && board[spot.y][spot.x - 1].player != player && board[spot.y][spot.x - 1].piece.strength < spot.piece.strength) { // opponent on adjacent square
+            	board[spot.y][spot.x - 1].setBackground(Color.BLUE);
+            	return true;
+            }
+        }
+   	 	if (spot.x + 1 <= 7) { // right exists
+            if (board[spot.y][spot.x + 1].piece != Piece.NONE && board[spot.y][spot.x + 1].player != player && board[spot.y][spot.x + 1].piece.strength < spot.piece.strength) { // opponent on adjacent square
+            	board[spot.y][spot.x + 1].setBackground(Color.BLUE);
+            	return true;
+            }
+   	 	}
+    	return false;
+    }
+    
+    
     /**
      * If a players moves run out or they decide to skip moves, the move count is reset and the game state is set to the other players turn
      */
@@ -445,6 +491,7 @@ public class ArimaaMain implements ActionListener {
         if (selectedSpot.piece != Piece.NONE && from == null) { // directs the player into selecting the from spot
             if (selectedSpot.player == player) {
                 from = selectedSpot;
+                pulled = from;
                 
                 handleFreezing(from);
              
@@ -456,7 +503,7 @@ public class ArimaaMain implements ActionListener {
 
                 handleWins();
                 handleFreezing(to);
-                this.executeValidMove();
+                this.executeValidMove(player);
                 this.handleTurnSwap();
                 trap();
                 recolorTrap();
@@ -500,8 +547,8 @@ public class ArimaaMain implements ActionListener {
     public void performPush(Player player, BoardButton spot) {
     	if(checkHighlight(spot)) {
     		spot.copy(pushed);
-    		this.executeValidMove();
-    		removePushHighlights();
+    		this.executeValidMove(player);
+    		removeBlueHighlights();
     		if(player == Player.GOLD) {
     			state = GameState.GOLD_TURN;
     		}else if(player == Player.SILVER) {
@@ -512,10 +559,35 @@ public class ArimaaMain implements ActionListener {
     	
     }
     
-	/**
+    
+    /**
+     * copies opponent's piece clicked on to pull to the spot
+     * the player has just moved from.
+     * @param player
+     * @param spot
+     */
+    public void performPull(Player player, BoardButton spot) {
+    	if(checkHighlight(spot)) {
+    		pulled.copy(spot);	
+    		removeBlueHighlights();
+    		if(player == Player.GOLD) {
+    			pulled.setBackground(new Color(192, 192, 192));
+    			pulled.setOpaque(true);
+    			state = GameState.GOLD_TURN;
+    		}else if(player == Player.SILVER) {
+    			pulled.setBackground(new Color(255, 215, 0));
+    			pulled.setOpaque(true);
+    			state = GameState.SILVER_TURN;
+    		}
+    		spot.reset();
+    	}
+    }
+    
+    
+    /**
 	 * Removes the blue highlighted boxes
 	 */
-    public void removePushHighlights() {
+    public void removeBlueHighlights() {
     	for(int x = 0; x < board.length; x++) {
     		for(int y = 0; y < board.length; y++) {
     			if(board[y][x].getBackground().equals(Color.BLUE)) {
@@ -595,8 +667,6 @@ public class ArimaaMain implements ActionListener {
        	 	}
     		
     	}
-    	
-    	
     
     	 return false;
     }
@@ -645,6 +715,7 @@ public class ArimaaMain implements ActionListener {
     	}
     }
     
+    
     /**
      * Disables all the buttons after a game is won
      */
@@ -656,6 +727,7 @@ public class ArimaaMain implements ActionListener {
     	}
     }
 
+    
     /**
      * Checks to see if the spot is a trap
      * @param spot
@@ -727,6 +799,7 @@ public class ArimaaMain implements ActionListener {
         this.movesRemainingLabel.setText("Moves remaining: " + (4 - moveCount));
     }
 
+   
     /**
      * Resets the move counter and updates moves remaining label
      */
@@ -775,6 +848,12 @@ public class ArimaaMain implements ActionListener {
             }
             else if (state == GameState.SILVER_PUSHING) {
             	performPush(Player.SILVER, selectedSpot);
+            }
+            else if (state == GameState.GOLD_PULLING) {
+            	performPull(Player.GOLD, selectedSpot);
+            }
+            else if (state == GameState.SILVER_PULLING) {
+            	performPull(Player.SILVER, selectedSpot);
             }
 
         }
