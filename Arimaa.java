@@ -419,13 +419,18 @@ public class ArimaaMain implements ActionListener {
      */
     private void executeValidMove(Player player) {
         to.copy(from);
+        System.out.println(canBePulled(from, player));
         if(canBePulled(from, player)) {
-        	if(player == Player.GOLD) {
-    			state = GameState.GOLD_PULLING;
-    		}
-    		else {
-    			state = GameState.SILVER_PULLING;
-    		}
+        	if(JOptionPane.showConfirmDialog(panel, "Pull opponent's piece?", "WARNING", JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+	        	if(player == Player.GOLD) {
+	    			state = GameState.GOLD_PULLING;
+	    		}
+	    		else {
+	    			state = GameState.SILVER_PULLING;
+	    		}
+        	}else {
+        		removeBlueHighlights();
+        	}
         }
         from.reset();
         from = null;
@@ -442,27 +447,40 @@ public class ArimaaMain implements ActionListener {
      */
     public boolean canBePulled(BoardButton spot, Player player) {
 		if(spot.y - 1 >= 0) {// top exists
-			if(board[spot.y - 1][spot.x].piece != Piece.NONE && board[spot.y - 1][spot.x].player != player && board[spot.y - 1][spot.x].piece.strength < spot.piece.strength) {// opponent on adjacent square	
+			if(board[spot.y - 1][spot.x].piece != Piece.NONE && board[spot.y - 1][spot.x].player != player && 
+				board[spot.y - 1][spot.x].piece.strength < spot.piece.strength) {// opponent on adjacent square	
 				board[spot.y - 1][spot.x].setBackground(Color.BLUE);
+				System.out.println("top");
 				return true;
 			}
 		}
 		if (spot.y + 1 <= 7) { // below exists
-            if (board[spot.y + 1][spot.x].piece != Piece.NONE && board[spot.y + 1][spot.x].player != player && board[spot.y + 1][spot.x].piece.strength < spot.piece.strength) { // opponent on adjacent square
+            if (board[spot.y + 1][spot.x].piece != Piece.NONE && board[spot.y + 1][spot.x].player != player && 
+            	board[spot.y + 1][spot.x].piece.strength < spot.piece.strength) { // opponent on adjacent square
             	board[spot.y + 1][spot.x].setBackground(Color.BLUE);
+            	System.out.println("bewlow");
             	return true;
             }
             
         }
    	 	if (spot.x - 1 >= 0) { // left exists
-            if (board[spot.x][spot.x - 1].piece != Piece.NONE && board[spot.y][spot.x - 1].player != player && board[spot.y][spot.x - 1].piece.strength < spot.piece.strength) { // opponent on adjacent square
+            if (board[spot.x][spot.x - 1].piece != Piece.NONE && board[spot.y][spot.x - 1].player != player && 
+            	board[spot.y][spot.x - 1].piece.strength < spot.piece.strength) { // opponent on adjacent square
             	board[spot.y][spot.x - 1].setBackground(Color.BLUE);
+            	System.out.println("Spot strength: " + board[spot.y][spot.x - 1].piece.strength);
+            	System.out.println("me strength: " + spot.piece.strength);
+            	System.out.println("Spot piece: " + board[spot.y][spot.x - 1].piece);
+            	System.out.println("spot player: " + board[spot.y][spot.x - 1].player);
+            	System.out.println("me player: " + player);
+            	
             	return true;
             }
         }
    	 	if (spot.x + 1 <= 7) { // right exists
-            if (board[spot.y][spot.x + 1].piece != Piece.NONE && board[spot.y][spot.x + 1].player != player && board[spot.y][spot.x + 1].piece.strength < spot.piece.strength) { // opponent on adjacent square
+            if (board[spot.y][spot.x + 1].piece != Piece.NONE && board[spot.y][spot.x + 1].player != player && 
+            	board[spot.y][spot.x + 1].piece.strength < spot.piece.strength) { // opponent on adjacent square
             	board[spot.y][spot.x + 1].setBackground(Color.BLUE);
+            	System.out.println("roghjt");
             	return true;
             }
    	 	}
@@ -578,6 +596,9 @@ public class ArimaaMain implements ActionListener {
     			pulled.setBackground(new Color(255, 215, 0));
     			pulled.setOpaque(true);
     			state = GameState.SILVER_TURN;
+    		}
+    		if(moveCount == 4) {
+    			handleTurnSwap();
     		}
     		spot.reset();
     	}
@@ -858,4 +879,3 @@ public class ArimaaMain implements ActionListener {
 
         }
     }
-}
