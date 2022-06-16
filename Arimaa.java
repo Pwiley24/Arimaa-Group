@@ -33,7 +33,7 @@ public class ArimaaMain implements ActionListener {
     }
 
     enum GameState {
-        GOLD_SETUP, SILVER_SETUP, GOLD_TURN, SILVER_TURN, GOLD_WIN, SILVER_WIN;
+        GOLD_SETUP, SILVER_SETUP, GOLD_TURN, SILVER_TURN, GOLD_WIN, SILVER_WIN, SILVER_PUSHING, GOLD_PUSHING;
     }
 
     class BoardButton extends JButton {
@@ -126,6 +126,7 @@ public class ArimaaMain implements ActionListener {
     BoardButton from;
     BoardButton to;
     BoardButton trap;
+    BoardButton pushed;
 
     public ArimaaMain() {
         this.createInterface();
@@ -311,7 +312,7 @@ public class ArimaaMain implements ActionListener {
     	}
     	
     	if (spot.y + 1 <= 7) { // right exists
-            if (board[spot.x + 1][spot.y].player == spot.player) { // if friendly, isn't frozen. Checks to the right
+            if (board[spot.y + 1][spot.x].player == spot.player) { // if friendly, isn't frozen. Checks to the right
                 return false;
             }
             else if (board[spot.y + 1][spot.x].piece != Piece.NONE && board[spot.x + 1][spot.y].piece.strength > spot.piece.strength) {
@@ -342,7 +343,11 @@ public class ArimaaMain implements ActionListener {
     	
 
     
-
+    /**
+     * will a piece on the board to frozen which will 
+     * prevent it from being able to move.
+     * @param spot
+     */
     private void handleFreezing(BoardButton spot) {
         if (isInFreezablePosition(spot)) {
             spot.piece.isFrozen = true;
@@ -389,8 +394,6 @@ public class ArimaaMain implements ActionListener {
         }
 
         if (from.piece.isFrozen) {
-            //System.out.println("is frozen");
-
             return false;
         }
 
@@ -399,11 +402,11 @@ public class ArimaaMain implements ActionListener {
             // is orthogonal
 
             // Verifies that board spot isn't taken
-            if (to.piece == Piece.NONE) {
+           // if (to.piece == Piece.NONE) {
                 // spot isn't taken
 
                 return true;
-            }
+            //}
         }
 
         return false;
@@ -425,10 +428,12 @@ public class ArimaaMain implements ActionListener {
      * If a players moves run out or they decide to skip moves, the move count is reset and the game state is set to the other players turn
      */
     private void handleTurnSwap() {
-        if (moveCount == 4 || JOptionPane.showConfirmDialog(panel, "Move again?", "WARNING", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
-            this.setGameState(state == GameState.GOLD_TURN ? GameState.SILVER_TURN : GameState.GOLD_TURN);
-            this.resetMoveCount();
-        }
+    	if(state == GameState.SILVER_TURN || state == GameState.GOLD_TURN) {
+	        if (moveCount == 4 || JOptionPane.showConfirmDialog(panel, "Move again?", "WARNING", JOptionPane.YES_NO_OPTION) == JOptionPane.NO_OPTION) {
+	            this.setGameState(state == GameState.GOLD_TURN ? GameState.SILVER_TURN : GameState.GOLD_TURN);
+	            this.resetMoveCount();
+	        }
+    	}
     }
 
     /**
@@ -437,22 +442,17 @@ public class ArimaaMain implements ActionListener {
      * @param selectedSpot
      */
     private void performMove(Player player, BoardButton selectedSpot) {
-    	
-        if (selectedSpot.piece != Piece.NONE) { // directs the player into selecting the from spot
+        if (selectedSpot.piece != Piece.NONE && from == null) { // directs the player into selecting the from spot
             if (selectedSpot.player == player) {
                 from = selectedSpot;
-               // System.out.println("the piece: " + from.piece);
                 
                 handleFreezing(from);
+             
             }
         }
         else if (from != null) { // means the player is selecting the to spot
-
             if (selectedSpot.piece == Piece.NONE && isValidMove(player, from, selectedSpot)) {
                 to = selectedSpot;
-
-               // System.out.println("from: " + from.x + " " + from.y);
-               // System.out.println("to: " + to.x + " " + to.y);
 
                 handleWins();
                 handleFreezing(to);
@@ -460,12 +460,142 @@ public class ArimaaMain implements ActionListener {
                 this.handleTurnSwap();
                 trap();
                 recolorTrap();
-            }else {
+            }
+            else if(selectedSpot.player != player && selectedSpot.piece != Piece.NONE && isValidMove(player, from, selectedSpot)) {
+            	
+            	to = selectedSpot;
+            	
+            	if(canBePushed(to)) {
+            		pushed = to;
+            		highlightPushSpots(pushed);
+            		if(player == Player.GOLD) {
+            			state = GameState.GOLD_PUSHING;
+            		}
+            		else {
+            			state = GameState.SILVER_PUSHING;
+            		}
+            		
+            		
+            	}
+            	else {
+            		JOptionPane.showMessageDialog(panel, "Can't push this piece.");
+            	}
+            	
+            	handleWins();
+                handleFreezing(to);
+                this.handleTurnSwap();
+                trap();
+                recolorTrap();
+               
+            }
+            else {
             	JOptionPane.showMessageDialog(panel, "Not a valid move.");
             }
         }
+       // System.out.println("push player: " + pushed.player);
+    	//System.out.println("push piece: " + pushed.piece);
     }
     
+    /**
+     * 
+     */
+    public void performPush(Player player, BoardButton spot) {
+    	if(checkHighlight(spot)) {
+    		spot.copy(pushed);
+    		this.executeValidMove();
+    		removePushHighlights();
+    		if(player == Player.GOLD) {
+    			state = GameState.GOLD_TURN;
+    		}else if(player == Player.SILVER) {
+    			state = GameState.SILVER_TURN;
+    		}
+    		
+    	}
+    	
+    }
+    
+    public void removePushHighlights() {
+    	for(int x = 0; x < board.length; x++) {
+    		for(int y = 0; y < board.length; y++) {
+    			if(board[y][x].getBackground().equals(Color.BLUE)) {
+    				board[y][x].setBackground(null);
+    				board[y][x].setOpaque(false);
+    			}
+    		}
+    	}
+    }
+    
+    public boolean checkHighlight(BoardButton spot) {
+    	if(spot.getBackground().equals(Color.BLUE)) {
+    		return true;
+    	}
+    	return false;
+    }
+    
+    /**
+     * Highlights empty squares adjacent to the piece getting pushed
+     */
+    public void highlightPushSpots(BoardButton spot) {
+    	if(spot.y - 1 >= 0) {// top exists
+			if(board[spot.y - 1][spot.x].piece == Piece.NONE) {// empty adjacent square
+				board[spot.y - 1][spot.x].setBackground(Color.BLUE);
+				board[spot.y - 1][spot.x].setOpaque(true);
+			}
+		}
+		if (spot.y + 1 <= 7) { // below exists
+            if (board[spot.y + 1][spot.x].piece == Piece.NONE) { // empty adjacent square
+            	board[spot.y + 1][spot.x].setBackground(Color.BLUE);
+				board[spot.y + 1][spot.x].setOpaque(true);
+            }
+            
+        }
+   	 	if (spot.x - 1 >= 0) { // left exists
+            if (board[spot.y][spot.x - 1].piece == Piece.NONE) { // empty adjacent square
+            	board[spot.y][spot.x - 1].setBackground(Color.BLUE);
+				board[spot.y][spot.x - 1].setOpaque(true);
+            }
+        }
+   	 	if (spot.x + 1 <= 7) { // right exists
+            if (board[spot.y][spot.x + 1].piece == Piece.NONE) { // empty adjacent square
+            	board[spot.y][spot.x + 1].setBackground(Color.BLUE);
+				board[spot.y][spot.x + 1].setOpaque(true);
+            }
+   	 	}
+    }
+    
+    /**
+     * Determines if a player can push a piece clicked on 
+     */
+    public boolean canBePushed(BoardButton spot) {
+    	if(from.piece.strength > spot.piece.strength) {//the pushing piece is stronger
+    		if(spot.y - 1 >= 0) {// top exists
+    			if(board[spot.y - 1][spot.x].piece == Piece.NONE) {// empty adjacent square	
+    				return true;
+    			}
+    		}
+    		if (spot.y + 1 <= 7) { // below exists
+                if (board[spot.y + 1][spot.x].piece == Piece.NONE) { // empty adjacent square
+                    return true;
+                }
+                
+            }
+       	 	if (spot.x - 1 >= 0) { // left exists
+                if (board[spot.y][spot.x - 1].piece == Piece.NONE) { // empty adjacent square
+                    return true;
+                }
+            }
+       	 	if (spot.x + 1 <= 7) { // right exists
+                if (board[spot.y][spot.x + 1].piece == Piece.NONE) { // empty adjacent square
+                    return true;
+                }
+       	 	}
+    		
+    	}
+    	
+    	
+    
+    	 return false;
+    }
     
     /**
      * Determines if there is a winning setup.
@@ -551,11 +681,7 @@ public class ArimaaMain implements ActionListener {
         	  if(!checkForFriends(trap)) { //no friends adjacent to piece on trap
           		trap.trapPiece();
           	}
-        }
-       
-
-        
-        
+        }  
     }
 
     
@@ -640,6 +766,13 @@ public class ArimaaMain implements ActionListener {
             else if (state == GameState.SILVER_TURN) {
                 performMove(Player.SILVER, selectedSpot);
             }
+            else if (state == GameState.GOLD_PUSHING) {
+            	performPush(Player.GOLD, selectedSpot);
+            }
+            else if (state == GameState.SILVER_PUSHING) {
+            	performPush(Player.SILVER, selectedSpot);
+            }
+
         }
     }
 }
