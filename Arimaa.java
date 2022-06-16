@@ -492,12 +492,10 @@ public class ArimaaMain implements ActionListener {
             	JOptionPane.showMessageDialog(panel, "Not a valid move.");
             }
         }
-       // System.out.println("push player: " + pushed.player);
-    	//System.out.println("push piece: " + pushed.piece);
     }
     
     /**
-     * 
+     * Copies the piece getting pushed onto the button clicked
      */
     public void performPush(Player player, BoardButton spot) {
     	if(checkHighlight(spot)) {
@@ -514,6 +512,9 @@ public class ArimaaMain implements ActionListener {
     	
     }
     
+	/**
+	 * Removes the blue highlighted boxes
+	 */
     public void removePushHighlights() {
     	for(int x = 0; x < board.length; x++) {
     		for(int y = 0; y < board.length; y++) {
@@ -525,6 +526,9 @@ public class ArimaaMain implements ActionListener {
     	}
     }
     
+    /*
+     * checks if a button clicked is highlighted blue
+     */
     public boolean checkHighlight(BoardButton spot) {
     	if(spot.getBackground().equals(Color.BLUE)) {
     		return true;
